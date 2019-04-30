@@ -1,5 +1,5 @@
 <?php
-namespace PhpCompiler;
+namespace PhpCompiler\ExpReg;
 class ExpReg{
     PUBLIC static function Id(): string{
         return "/^[a-zA-Z]\w*/";

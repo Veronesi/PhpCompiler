@@ -2,6 +2,8 @@
 namespace PhpCompiler;
     include('Color.php');
     include('ExpReg.php');
+
+    use \PhpCompiler\ExpReg as ExpReg;
     
 class AnalizadorLexico{
     private $errores;
@@ -75,7 +77,7 @@ class AnalizadorLexico{
                     $subTexto = substr($subTexto, strlen($cantidadDeEspacios[0]));
         
                     # Buscamos la primera palabra.
-                    preg_match(ExpReg::e(),$subTexto, $palabraEncontrada);
+                    preg_match(ExpReg\ExpReg::e(),$subTexto, $palabraEncontrada);
                     $palabra = $palabraEncontrada[0];
                     $this->posicion+= strlen($palabra);
                     self::GetToken($palabra);
@@ -111,21 +113,21 @@ class AnalizadorLexico{
         }
 
         # Identificador.
-        if(preg_match(ExpReg::Id(), $palabra)){
+        if(preg_match(ExpReg\ExpReg::Id(), $palabra)){
             array_push($this->tokens, array('ID' => $palabra, 'line' => $this->row));
             $this->listo.= " ".'ID';
             return true;
         }
 
         # Cadena.
-        if(preg_match(ExpReg::Cadena(), $palabra)){
+        if(preg_match(ExpReg\ExpReg::Cadena(), $palabra)){
             array_push($this->tokens, array('CADENA' => $palabra, 'line' => $this->row));
             $this->listo.= " ".'CADENA';
             return true;
         }   
 
         # Numero.
-        if(preg_match(ExpReg::Numero(), $palabra)){
+        if(preg_match(ExpReg\ExpReg::Numero(), $palabra)){
             array_push($this->tokens, array('NUMERO' => $palabra, 'line' => $this->row));
             $this->listo.= " ".'NUMERO';
             return true;

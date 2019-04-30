@@ -106,30 +106,30 @@ class AnalizadorSintactico{
     public function GetGeneradores(string $token): array{
         $generadores = array();
         # Recorremos las produciones.
-        foreach ($this->P as $key => $produccion) {
+        foreach ($this->P as $keyP => $produccion) {
             # Verificamos cuales empiezan con este token.
             if($produccion[key($produccion)][0] == $token)
             {
                 # Verificamos si puede producirse mediante <Programa>
                 $condicion = false;
                 self::GenerateByS(key($produccion), $condicion);
-                if($condicion){
-                    $arbol = new Arbol(key($produccion), $produccion[key($produccion)]);
-                    array_push($generadores, $arbol);
-                }
+                if($condicion)
+                    array_push($generadores, new Arbol(key($produccion), $produccion[key($produccion)]));
             }
         }
         return $generadores;
     }
-
-    public function GenerateByS($elemento, &$esGenerado){
-        if($elemento == $this->S){
+    /**
+     * @var string $elemento 
+     * @var bool &$esGenerado
+     */
+    public function GenerateByS(string $elemento, bool &$esGenerado): void{
+        if($elemento == $this->S)
             $esGenerado = true;
-        }else{
-            foreach ($this->P as $key => $produccion){
-                if($produccion[key($produccion)][0] == $elemento){
+        else{
+            foreach ($this->P as $keyP => $produccion){
+                if($produccion[key($produccion)][0] == $elemento)
                     self::GenerateByS(key($produccion), $esGenerado);
-                }  
             }
         }
     }
