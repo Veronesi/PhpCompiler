@@ -1,12 +1,15 @@
 <?php
 namespace PhpCompiler;
+
     include('Arbol.php');
     include('Color.php');
+    include('Producciones.php');
+
+    use \PhpCompiler\Producciones;
+    
+
 class AnalizadorSintactico{
 
-    private $variables;
-    private $terminales;
-    private $simboloInicial;
     private $tokens;
     private $T;
     private $V;
