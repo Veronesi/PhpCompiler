@@ -1,4 +1,5 @@
 <?php
+namespace PhpCompiler;
     include('Color.php');
     include('ExpReg.php');
     

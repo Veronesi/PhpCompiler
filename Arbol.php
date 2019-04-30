@@ -1,4 +1,5 @@
 <?php
+namespace PhpCompiler;
 class Arbol{
     public $nodo;
     public $hijos;

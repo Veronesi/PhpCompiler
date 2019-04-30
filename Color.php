@@ -1,4 +1,5 @@
 <?php
+namespace PhpCompiler;
 class Color{
     private static $HEADER = "\033[95m";
     private static $OKBLUE = "\033[94m";

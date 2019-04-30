@@ -1,4 +1,5 @@
 <?php
+namespace PhpCompiler;
     include('Arbol.php');
     include('Color.php');
 class AnalizadorSintactico{
