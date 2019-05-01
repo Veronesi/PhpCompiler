@@ -69,4 +69,21 @@ class Arbol{
         }
         return $count;
     }
+    
+    public function MostrarArbol($posicion = 0, $lineas = "",$cod = ""){
+        print "\n".$cod.$this->nodo;
+        $lineas2.= "│   ".$lineas;
+        foreach ($this->hijos as $key => $hijo) {
+            $cod = "├───";
+            if($key == count($this->hijos) -1){
+                $cod = "└───";
+                $lineas2.= "   ".$lineas;
+            }
+            if(gettype($hijo) == "object"){
+                $hijo->MostrarArbol($posicion++,$lineas2, $cod);
+            }else{
+                print "\n".$lineas.$cod.$hijo;
+            }
+        }
+    }
 }

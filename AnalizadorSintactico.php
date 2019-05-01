@@ -1,13 +1,14 @@
 <?php
 namespace PhpCompiler;
-
     include('Arbol.php');
     include('Color.php');
     include('Producciones.php');
+    include('Terminales.php');
+    include('Variables.php');
 
     use \PhpCompiler\Producciones;
-    
-
+    use \PhpCompiler\Terminales;
+    use \PhpCompiler\Variables;
 class AnalizadorSintactico{
 
     private $tokens;
@@ -15,7 +16,7 @@ class AnalizadorSintactico{
     private $V;
     private $P;
     private $S;
-
+    private $P2;
     function __construct(){
 
         # Tokens
@@ -26,20 +27,25 @@ class AnalizadorSintactico{
         array_push($this->tokens, array('PUNTOYCOMA' => ';', 'line' => 4));
         
         # Conjunto finito de terminales
-        $this->T = array('ID','NUMERO','PUNTOYCOMA','OPERADORASIGNACION', 'OPERADOR', 'EPSILON');
+        $this->T = \PhpCompiler\Terminales\terminales;
         
         # Conjunto finito de variables
-        $this->V = array('<Asignacion>', '<ExpresionAritmetica>', '<Programa>');
+        $this->V = \PhpCompiler\Variables\variables;
         
         # Símbolo inicial
         $this->S = "<Programa>";
 
         # Conjunto finito de producciones
         $this->P = array();
+        /*
         array_push($this->P, array('<Programa>' => array('<Asignacion>', 'PUNTOYCOMA')));
         array_push($this->P, array('<Asignacion>' => array('ID', 'OPERADORASIGNACION', '<ExpresionAritmetica>')));
         array_push($this->P, array('<ExpresionAritmetica>' => array('NUMERO')));
         array_push($this->P, array('<ExpresionAritmetica>' => array('ID')));
+        */
+        foreach (\PhpCompiler\Producciones\producciones as $key => $value) {
+            array_push($this->P, $value);
+        }
     }
 
     public function Analizar(){
@@ -104,7 +110,8 @@ class AnalizadorSintactico{
                 }
             }
         }
-        if(count($produccionesPosibles)) : print_r($produccionesPosibles); endif;
+        #if(count($produccionesPosibles)) : print_r($produccionesPosibles); endif;
+        print $produccionesPosibles[3]->MostrarArbol();
     }
     public function GetGeneradores(string $token): array{
         $generadores = array();
@@ -126,7 +133,7 @@ class AnalizadorSintactico{
      * @var string $elemento 
      * @var bool &$esGenerado
      */
-    public function GenerateByS(string $elemento, bool &$esGenerado): void{
+        public function GenerateByS(string $elemento, bool &$esGenerado): void{
         if($elemento == $this->S)
             $esGenerado = true;
         else{
