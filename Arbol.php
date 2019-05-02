@@ -1,5 +1,6 @@
 <?php
 namespace PhpCompiler;
+
 class Arbol{
     public $nodo;
     public $hijos;
@@ -10,7 +11,7 @@ class Arbol{
     public function CantidadHijos(): int{
         $count = 0;
         foreach ($this->hijos as $key => $hijo) {
-            if(gettype($hijo) == "Arbol"){
+            if(gettype($hijo) == "object"){
                 $count += $hijo->CantidadHijos();
             }else{
                 $count++;
@@ -21,7 +22,7 @@ class Arbol{
     public function DeleteEpsilon(int $posicion): int{
         $count = 0;
         foreach ($this->hijos as $keyH => $hijo) {
-            if(gettype($hijo) == "Arbol"){
+            if(gettype($hijo) == "object"){
                 if($hijo->CantidadHijos() == 1 & $posicion = ($count + 1) ){
                     unset($this->hijos[$keyH]);
                 }else{
@@ -57,7 +58,7 @@ class Arbol{
     public function SetChild(Arbol $nodo , int $posicion): int{
         $count = 0;
         foreach ($this->hijos as $key => $hijo) {
-            if(gettype($hijo) == "Arbol"){
+            if(gettype($hijo) == "object"){
                 $count += $hijo->SetChild($nodo, ($posicion - $count));
             }else{
                 if($count == $posicion)

@@ -53,14 +53,16 @@ class AnalizadorSintactico{
 
         # Recorremos los Tokens
         for($i = 0; $i < count($this->tokens); $i++){
+
             # Primer elemento
             if($i == 0){
-                foreach (self::GetGeneradores(key($this->tokens[0])) as $keyP => $Produccion) {
-                    array_push($produccionesPosibles, $Produccion);
+                foreach ($this->P as $keyP => $Produccion) {
+                    if($Produccion[key($Produccion)][0] == key($this->tokens[0]))
+                        array_push($produccionesPosibles, new Arbol(key($Produccion), $Produccion[key($Produccion)]));                      
                 }
             }else{
                 # Recorremos las posibles producciones:
-                foreach ($produccionesPosibles as $keyPp => $ProduccionPosible) {
+                foreach ($produccionesPosibles as $keyPp => $ProduccionPosible){
                     $nodo = $ProduccionPosible->GetElemento($i);
                     # Si es un terminal:
                     if(in_array($nodo, $this->T)){
@@ -110,8 +112,8 @@ class AnalizadorSintactico{
                 }
             }
         }
-        #if(count($produccionesPosibles)) : print_r($produccionesPosibles); endif;
-        print $produccionesPosibles[3]->MostrarArbol();
+        if(count($produccionesPosibles)) : var_dump($produccionesPosibles); endif;
+        #print $produccionesPosibles[3]->MostrarArbol();
     }
     public function GetGeneradores(string $token): array{
         $generadores = array();
