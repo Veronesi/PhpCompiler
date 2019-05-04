@@ -14,7 +14,8 @@ class Arbol{
             if(gettype($hijo) == "object"){
                 $count += $hijo->CantidadHijos();
             }else{
-                $count++;
+                if($hijo != 'EPSILON')
+                    $count++;
             }
         }
         return $count;       
@@ -38,6 +39,7 @@ class Arbol{
         $contador = 0;
         while($contador <= $posicion){
             if(gettype($this->hijos[$contador]) == "object"){
+                
                 if($this->hijos[$contador]->CantidadHijos() > ($posicion - $contador)){
                     # Esta aca dentro
                     $nodo =  $this->hijos[$contador]->GetElemento($posicion - $contador);
@@ -51,7 +53,8 @@ class Arbol{
                 return $this->hijos[$contador];
             }
         }  
-        return 0;
+        #return 0;
+        return "FULL_STACK";
     }
 
 
@@ -61,9 +64,9 @@ class Arbol{
             if(gettype($hijo) == "object"){
                 $count += $hijo->SetChild($nodo, ($posicion - $count));
             }else{
-                if($count == $posicion)
+                if($count == $posicion){
                     $this->hijos[$count] = $nodo;
-                else
+                }else
                     # Pasamos al proximo elemento.
                     $count++;
             }

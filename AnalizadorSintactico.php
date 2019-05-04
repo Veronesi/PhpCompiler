@@ -48,6 +48,125 @@ class AnalizadorSintactico{
         }
     }
 
+    public function Analizar2(){
+        # Lista de las producciones que posiblemente puedan generar a Tokens
+        $resultado = array();
+        $i = 1;
+
+        # Es el primer elemento
+        $resultado = self::Generadores(key($this->tokens[0]));
+
+        while($i< count($this->tokens)){
+            $ProximoToken = true;
+            print "\n-------------------------------------------";
+            print "\nToken a analizar: ".key($this->tokens[$i]);
+            
+                # Recorremos las producciones obtenemos el i-esimo elemento del arbol.
+                foreach ($resultado as $keyR => $unResultado) {
+                    $nodo = $unResultado->GetElemento($i);
+                    print "\n  - . - . - . - . - $keyR - . - . - . - . - . -";
+                    print "\nNodo: $nodo";
+                    print "\nCantidad de hijos: ".$unResultado->CantidadHijos();
+                    if($unResultado->CantidadHijos() -1 < $i){
+                        # el arbol esta completo.
+                        print Color::Ok("\nEl arbol esta completo");
+                        # Buscamos quienes producen a la raiz del arbol.
+                        $nuevasRaices = self::Generadores($unResultado->nodo);
+                        if(count($nuevasRaices) > 0){
+                            foreach ($nuevasRaices as $keyRz => $raiz) {
+                                # Insertamos el arbol viejo en el primer hijo de la nueva raiz.
+                                $arbolNuevo = $raiz;
+                                $arbolNuevo->SetChild(clone $unResultado, 0);  
+                                array_push($resultado, $arbolNuevo);
+                            }
+                            $ProximoToken = false;
+                        }else{
+                            print Color::Error("\nLo eliminamos ya que nadie lo genera.");
+                        }
+                        # Eliminamos el arbol viejo.
+                        print Color::Error("\nSe a eliminado el arbol $keyR.");
+                        unset($resultado[$keyR]);
+
+                    }
+                    # Verificamos que es.
+                    elseif(in_array($nodo, $this->T)){
+                        # Es un terminal.
+                        print "\nEl nodo es un terminal";
+                        # Verificamos si es distinto al token.
+                        if($nodo != key($this->tokens[$i])){
+                            print Color::Error("\nNo coinciden los tokens");
+                            # Verificamos si era el ultimo posible arbol.
+                            if(count($resultado) == 1)
+                                print "\n".Color::Advertencia("\nError de Analisis").": error sintactico, no se esperaba '".$this->tokens[$i][key($this->tokens[$i])]."' en ".__DIR__."\\codigoFuente.f"." en Linea ".$this->tokens[$i]['line']."\n";
+                            # Eliminamos el arbol.
+                            unset($resultado[$keyR]);
+                        }else
+                            print Color::Ok("\nCoinciden los tokens");
+
+                    }elseif(in_array($nodo, $this->V)){
+                        # El nodo no es una Variable.
+                        print "\nEl nodo es una Variable";
+                        # Buscamos las producciones que generan a esta variable.
+                        $subProducciones = self::Genera($nodo);
+                        # Insertamos los subarboles en el arbol viejo
+                        if(count($subProducciones) > 0){
+                            foreach ($subProducciones as $keySP => $unaSubProduccion){
+                                print "\n============================\n";
+                                print_r($unaSubProduccion);
+                                print "\n============================";
+                                $arbolNuevo = unserialize(serialize($unResultado));
+                                print "\nArbol nuevo:\n:";
+                                print_r($arbolNuevo);
+                                $arbolNuevo->SetChild($unaSubProduccion, $i);
+                                array_push($resultado, $arbolNuevo);
+                            }
+                            # Eliminamos el arbol viejo.
+                            unset($resultado[$keyR]);
+                            $ProximoToken = false;
+                        }else{
+                            print Color::Error("\nLo eliminamos ya que nadie lo genera.");
+                            # Lo eliminamos ya que nadie lo genera.
+                            unset($resultado[$keyR]);
+                        }
+
+                    }
+                }
+            if($ProximoToken)
+                $i++;
+        }
+        print Color::Ok("\nEl arbol generador es:\n");
+        print_r($resultado);
+    }
+    public function Genera(string $token): array{
+        $return = array();
+
+        # Recorremos las Producciones.
+        foreach ($this->P as $keyP => $unaProduccion) {
+
+            # Verificamos si la variable es igual a la key.
+            if($token == key($unaProduccion))
+                array_push($return, new Arbol(key($unaProduccion), $unaProduccion[key($unaProduccion)]));
+        }
+        print "\nEl elemento $token puede ser generador por:\n";
+        var_dump($return);
+        return $return;
+    }    
+    public function Generadores(string $token): array{
+        $return = array();
+
+        # Recorremos las Producciones.
+        foreach ($this->P as $keyP => $unaProduccion) {
+
+            # Verificamos si el primer elemento es igual al token.
+            if($token == $unaProduccion[key($unaProduccion)][0])
+                array_push($return, new Arbol(key($unaProduccion), $unaProduccion[key($unaProduccion)]));
+        }
+        print "\nEl elemento $token puede ser generador por:\n";
+        var_dump($return);
+        return $return;
+    }
+
+
     public function Analizar(){
         $produccionesPosibles = array();
 
@@ -115,6 +234,7 @@ class AnalizadorSintactico{
         if(count($produccionesPosibles)) : var_dump($produccionesPosibles); endif;
         #print $produccionesPosibles[3]->MostrarArbol();
     }
+
     public function GetGeneradores(string $token): array{
         $generadores = array();
         # Recorremos las produciones.
@@ -148,4 +268,4 @@ class AnalizadorSintactico{
 }
 
 $AnalizadorSintactico = new AnalizadorSintactico();
-$AnalizadorSintactico->Analizar();
+$AnalizadorSintactico->Analizar2();
