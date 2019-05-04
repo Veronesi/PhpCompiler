@@ -48,7 +48,7 @@ class AnalizadorSintactico{
         }
     }
 
-    public function Analizar2(){
+    public function Analizar(){
         # Lista de las producciones que posiblemente puedan generar a Tokens
         $resultado = array();
         $i = 1;
@@ -111,9 +111,6 @@ class AnalizadorSintactico{
                         # Insertamos los subarboles en el arbol viejo
                         if(count($subProducciones) > 0){
                             foreach ($subProducciones as $keySP => $unaSubProduccion){
-                                print "\n============================\n";
-                                print_r($unaSubProduccion);
-                                print "\n============================";
                                 $arbolNuevo = unserialize(serialize($unResultado));
                                 print "\nArbol nuevo:\n:";
                                 print_r($arbolNuevo);
@@ -166,75 +163,6 @@ class AnalizadorSintactico{
         return $return;
     }
 
-
-    public function Analizar(){
-        $produccionesPosibles = array();
-
-        # Recorremos los Tokens
-        for($i = 0; $i < count($this->tokens); $i++){
-
-            # Primer elemento
-            if($i == 0){
-                foreach ($this->P as $keyP => $Produccion) {
-                    if($Produccion[key($Produccion)][0] == key($this->tokens[0]))
-                        array_push($produccionesPosibles, new Arbol(key($Produccion), $Produccion[key($Produccion)]));                      
-                }
-            }else{
-                # Recorremos las posibles producciones:
-                foreach ($produccionesPosibles as $keyPp => $ProduccionPosible){
-                    $nodo = $ProduccionPosible->GetElemento($i);
-                    # Si es un terminal:
-                    if(in_array($nodo, $this->T)){
-                        if($nodo == 'EPSILON'){
-                            # Eliminamos el nodo que genera a EPSILON
-                            $ProduccionPosible->DeleteEpsilon($i);
-                            $i--;
-                        }elseif($nodo != key($this->tokens[$i])){
-                            if(count($produccionesPosibles) == 1){
-                                print "\n".Color::Advertencia("Error de Analisis").": error sintactico, no se esperaba '".$this->tokens[$i][key($this->tokens[$i])]."' en ".__DIR__."\\codigoFuente.f"." en Linea ".$this->tokens[$i]['line']."\n";
-                            }
-                            unset($produccionesPosibles[$keyPp]);
-                        }
-                    # Si es una Variable.
-                    }elseif(in_array($nodo, $this->V)){
-                        foreach ($this->P as $keyP => $Produccion){
-                            if(key($Produccion) == $nodo){
-                                # Copiamos el arbol a reemplazar.
-                                $arbolViejo = clone $ProduccionPosible;
-                                $arbolViejo->SetChild(new Arbol($nodo, $Produccion[key($Produccion)]), $i);
-                                array_push($produccionesPosibles, $arbolViejo);
-                            }
-                        }
-                        # Eliminamos el arbol viejo
-                        unset($produccionesPosibles[$keyPp]);
-
-                        # Disminuimos en 1 $i para volver a verificarlo.
-                        $i--;
-                    }elseif($nodo == 0){
-                        # Todos son terminales. 
-                        # Buscamos que producen la raiz de los arbol.
-                        foreach ($this->P as $keyP => $Produccion){
-                            if($produccionesPosibles[$keyPp]->nodo == $Produccion[key($Produccion)][0]){
-                                # Copiamos el arbol a reemplazar.
-                                $arbolViejo = clone $ProduccionPosible;
-                                $nuevaRaiz = new Arbol(key($Produccion), $Produccion[key($Produccion)]); 
-                                $nuevaRaiz->SetChild($arbolViejo, 0);
-                                array_push($produccionesPosibles, $nuevaRaiz);
-                            }
-                        }
-                        # Eliminamos el arbol viejo
-                        unset($produccionesPosibles[$keyPp]);
-
-                        # Disminuimos en 1 $i para volver a verificarlo.
-                        $i--;
-                    }
-                }
-            }
-        }
-        if(count($produccionesPosibles)) : var_dump($produccionesPosibles); endif;
-        #print $produccionesPosibles[3]->MostrarArbol();
-    }
-
     public function GetGeneradores(string $token): array{
         $generadores = array();
         # Recorremos las produciones.
@@ -268,4 +196,4 @@ class AnalizadorSintactico{
 }
 
 $AnalizadorSintactico = new AnalizadorSintactico();
-$AnalizadorSintactico->Analizar2();
+$AnalizadorSintactico->Analizar();
