@@ -121,7 +121,7 @@ class AnalizadorLexico{
         }
     }
 }
-/*
+
 if($_SERVER['argv'][1] == '-C'){
     if($_SERVER['argv'][2]){
         if(file_exists(__DIR__."\\".$_SERVER['argv'][2])){
@@ -136,7 +136,7 @@ if($_SERVER['argv'][1] == '-C'){
 }else{
     print "Por favor ejecuta: \"php ".$_SERVER['argv'][0]." -C NombreDelArchivo.f\"";
 }
-*/
+
 $AnalizadorLexico = new AnalizadorLexico();
 $AnalizadorLexico->Analizar();
 ?>
