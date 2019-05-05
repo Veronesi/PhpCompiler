@@ -37,12 +37,6 @@ class AnalizadorSintactico{
 
         # Conjunto finito de producciones
         $this->P = array();
-        /*
-        array_push($this->P, array('<Programa>' => array('<Asignacion>', 'PUNTOYCOMA')));
-        array_push($this->P, array('<Asignacion>' => array('ID', 'OPERADORASIGNACION', '<ExpresionAritmetica>')));
-        array_push($this->P, array('<ExpresionAritmetica>' => array('NUMERO')));
-        array_push($this->P, array('<ExpresionAritmetica>' => array('ID')));
-        */
         foreach (\PhpCompiler\Producciones\producciones as $key => $value) {
             array_push($this->P, $value);
         }
