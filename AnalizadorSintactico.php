@@ -133,7 +133,56 @@ class AnalizadorSintactico{
         }
         print Color::Ok("\nEl arbol generador es:\n");
         print_r($resultado);
+
+        # 1. Verificamos si el nodo raiz pertenece a S o puede generarse por el:
+        $seguir = true;
+        while($seguir){
+            $seguir = false;
+            # Verificamos si los nodos raices pertenecen a S y completamos los nodos que aun son variables.
+            foreach ($resultado as $keyR => $unResultado) {
+                $ArbolesRooteados = self::ForceRoot($unResultado);
+                switch ($ArbolesRooteados) {
+                    case 'IS_ROOT':
+                        #array_push($resultado, $unResultado);
+                        break;
+                    case 'NOT_ROOTEABLE':
+                        unset($resultado[$keyR]); 
+                    break;
+                    default:
+                    $resultado = array_merge_recursive($resultado, $ArbolesRooteados);
+                    $seguir = true;
+                        break;
+                }
+            }
+        }
+        print Color::Ok("\nRooteados: \n");
+        print_r($resultado);
     }
+
+    public function ForceRoot(Arbol $arbol){
+        if($arbol->nodo != $this->S){
+            $return = array();
+            # Buscamos quienes generan a la raiz.
+            foreach ($this->P as $keyP => $unaProduccion){
+                if($unaProduccion[key($unaProduccion)][0] == $arbol->nodo && self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
+                    $arbolNuevo = $unaProduccion;
+                    $arbolNuevo->SetChild(unserialize(serialize($arbol)), 0);
+                    array_push($return, $arbolNuevo);
+                }
+            }
+            return (count($return) ? $return : 'NOT_ROOTEABLE'); 
+        }else
+            return "IS_ROOT";
+    }
+
+    public function PoseeTerminales(array $childs): bool{
+        # Eliminamos las ocurrencias de los Epsilon.
+        $childs = array_diff($childs, array('EPSILON'));
+        if(count(array_intersect($childs, $this->T)))
+            return false;
+        return true;
+    }
+
     public function Genera(string $token): array{
         $return = array();
 
