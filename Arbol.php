@@ -1,6 +1,8 @@
 <?php
 namespace PhpCompiler;
 
+include_once('color.php');
+
 class Arbol{
     public $nodo;
     public $hijos;
@@ -75,7 +77,7 @@ class Arbol{
     }
     public function MostrarArbol($nivel = 0, $cuerpo = ""){
 
-        print $this->nodo;
+        print Color::Blue($this->nodo);
         foreach ($this->hijos as $keyH => $hijo) {
             if(gettype($hijo) == "object"){
                 if($keyH == (count($this->hijos) -1) ){
@@ -84,13 +86,27 @@ class Arbol{
                 }
                 else{
                     print "\n".$cuerpo."├───";
-                    $hijo->MostrarArbol($nivel + 1,$cuerpo."|   ");
+                    $hijo->MostrarArbol($nivel + 1,$cuerpo."│   ");
                 }
             }else{
-                if($keyH == (count($this->hijos) -1) )
-                    print "\n".$cuerpo."└───".$hijo;
-                else
-                    print "\n".$cuerpo."├───".$hijo;
+                if(preg_match('/\</',$hijo)){
+                    if($keyH == (count($this->hijos) -1) )
+                        print "\n".$cuerpo."└───".Color::Advertencia($hijo);
+                    else
+                        print "\n".$cuerpo."├───".Color::Advertencia($hijo);
+                }else{
+                    if($hijo == 'EPSILON'){
+                        if($keyH == (count($this->hijos) -1) )
+                        print "\n".$cuerpo."└───".Color::EPSILON($hijo);
+                    else
+                        print "\n".$cuerpo."├───".Color::EPSILON($hijo);
+                    }else{
+                        if($keyH == (count($this->hijos) -1) )
+                        print "\n".$cuerpo."└───".Color::Yellow($hijo);
+                    else
+                        print "\n".$cuerpo."├───".Color::Yellow($hijo);
+                    }
+                }
             }
         }
     }

@@ -1,7 +1,7 @@
 <?php
 namespace PhpCompiler;
-    include('Arbol.php');
     include('Color.php');
+    include('Arbol.php');
     include('Producciones.php');
     include('Terminales.php');
     include('Variables.php');
@@ -106,7 +106,7 @@ class AnalizadorSintactico{
                         if(count($subProducciones) > 0){
                             foreach ($subProducciones as $keySP => $unaSubProduccion){
                                 $arbolNuevo = unserialize(serialize($unResultado));
-                                print "\nArbol nuevo:\n\n| | | | | | | | | | | | \n\n";
+                                print "\nArbol nuevo:\n\n\n\n";
                                 $arbolNuevo->MostrarArbol();
                                 $arbolNuevo->SetChild($unaSubProduccion, $i);
                                 array_push($resultado, $arbolNuevo);
@@ -179,7 +179,7 @@ class AnalizadorSintactico{
 
     public function ArrayToTree(array $array){
         foreach ($array as $keyA => $arbol) {
-            print "\n\n| | | | | | | | | | | | \n\n";
+            print "\n\n\n\n";
             $arbol->MostrarArbol();
         }
     }
@@ -193,7 +193,7 @@ class AnalizadorSintactico{
                     if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
                         $arbolNuevo = unserialize(serialize($arbol));
                         $subArbol = new Arbol(key($unaProduccion) ,$unaProduccion[key($unaProduccion)]);
-                        $arbolNuevo->SetChild($subArbol, $pos-2);
+                        $arbolNuevo->SetChild($subArbol, $pos -2);  # Arreglar esta linea
                         array_push($return, $arbolNuevo);
                     }
                 }
