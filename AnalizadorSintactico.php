@@ -112,8 +112,8 @@ class AnalizadorSintactico{
                         if(count($subProducciones) > 0){
                             foreach ($subProducciones as $keySP => $unaSubProduccion){
                                 $arbolNuevo = unserialize(serialize($unResultado));
-                                print "\nArbol nuevo:\n:";
-                                print_r($arbolNuevo);
+                                print "\nArbol nuevo:\n\n| | | | | | | | | | | | \n\n";
+                                $arbolNuevo->MostrarArbol();
                                 $arbolNuevo->SetChild($unaSubProduccion, $i);
                                 array_push($resultado, $arbolNuevo);
                             }
@@ -132,7 +132,7 @@ class AnalizadorSintactico{
                 $i++;
         }
         print Color::Ok("\nEl arbol generador es:\n");
-        print_r($resultado);
+        self::ArrayToTree($resultado);
 
         # 1. Verificamos si el nodo raiz pertenece a S o puede generarse por el:
         $seguir = true;
@@ -143,7 +143,7 @@ class AnalizadorSintactico{
                 $ArbolesRooteados = self::ForceRoot($unResultado);
                 switch ($ArbolesRooteados) {
                     case 'IS_ROOT':
-                        #array_push($resultado, $unResultado);
+
                         break;
                     case 'NOT_ROOTEABLE':
                         unset($resultado[$keyR]); 
@@ -156,7 +156,57 @@ class AnalizadorSintactico{
             }
         }
         print Color::Ok("\nRooteados: \n");
-        print_r($resultado);
+        self::ArrayToTree($resultado);
+
+        # 2. Verificamos que sean todos Terminales y no quede ninguna Variable.
+        $seguir = true;
+        while($seguir){
+            $seguir = false;
+            # Verificamos si los hijos del arbol sean todos terminales.
+            foreach ($resultado as $keyR => $unResultado) {
+                $ArbolesTerminales = self::ForceTerminal($unResultado);
+                switch ($ArbolesTerminales) {
+                    case 'IS_TERMINALIZE':
+                        break;
+                    case 'NOT_TERMINALIZE':
+                        unset($resultado[$keyR]); 
+                    break;
+                    default:
+                    $resultado = array_merge_recursive($resultado, $ArbolesTerminales);
+                    unset($resultado[$keyR]);
+                    $seguir = true;
+                        break;
+                }
+            }
+        }
+        print Color::Ok("\nTerminales: \n");
+        self::ArrayToTree($resultado);      
+    }
+
+    public function ArrayToTree(array $array){
+        foreach ($array as $keyA => $arbol) {
+            print "\n\n| | | | | | | | | | | | \n\n";
+            $arbol->MostrarArbol();
+        }
+    }
+
+    public function ForceTerminal(Arbol $arbol){
+        for ($pos=0; $pos < $arbol->CantidadHijos(); $pos++) { 
+            $elem = $arbol->GetElemento($pos);
+            if (in_array($elem, $this->V)){
+                $return = array();
+                foreach ($this->P as $keyP => $unaProduccion) {
+                    if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
+                        $arbolNuevo = unserialize(serialize($arbol));
+                        $subArbol = new Arbol(key($unaProduccion) ,$unaProduccion[key($unaProduccion)]);
+                        $arbolNuevo->SetChild($subArbol, $pos-2);
+                        array_push($return, $arbolNuevo);
+                    }
+                }
+                return (count($return) ? $return : 'NOT_TERMINALIZE');
+            }
+        }
+        return "IS_TERMINALIZE";
     }
 
     public function ForceRoot(Arbol $arbol){
@@ -164,7 +214,7 @@ class AnalizadorSintactico{
             $return = array();
             # Buscamos quienes generan a la raiz.
             foreach ($this->P as $keyP => $unaProduccion){
-                if($unaProduccion[key($unaProduccion)][0] == $arbol->nodo && self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
+                if($unaProduccion[key($unaProduccion)][0] == $arbol->nodo && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
                     $arbolNuevo = $unaProduccion;
                     $arbolNuevo->SetChild(unserialize(serialize($arbol)), 0);
                     array_push($return, $arbolNuevo);
@@ -177,10 +227,12 @@ class AnalizadorSintactico{
 
     public function PoseeTerminales(array $childs): bool{
         # Eliminamos las ocurrencias de los Epsilon.
+        if(count($childs) == 1 && $childs[0] == 'EPSILON')
+            return false;
         $childs = array_diff($childs, array('EPSILON'));
         if(count(array_intersect($childs, $this->T)))
-            return false;
-        return true;
+            return true;
+        return false;
     }
 
     public function Genera(string $token): array{
@@ -194,7 +246,7 @@ class AnalizadorSintactico{
                 array_push($return, new Arbol(key($unaProduccion), $unaProduccion[key($unaProduccion)]));
         }
         print "\nEl elemento $token puede ser generador por:\n";
-        var_dump($return);
+        self::ArrayToTree($return);
         return $return;
     }    
     public function Generadores(string $token): array{
@@ -208,39 +260,8 @@ class AnalizadorSintactico{
                 array_push($return, new Arbol(key($unaProduccion), $unaProduccion[key($unaProduccion)]));
         }
         print "\nEl elemento $token puede ser generador por:\n";
-        var_dump($return);
+        self::ArrayToTree($return);
         return $return;
-    }
-
-    public function GetGeneradores(string $token): array{
-        $generadores = array();
-        # Recorremos las produciones.
-        foreach ($this->P as $keyP => $produccion) {
-            # Verificamos cuales empiezan con este token.
-            if($produccion[key($produccion)][0] == $token)
-            {
-                # Verificamos si puede producirse mediante <Programa>
-                $condicion = false;
-                self::GenerateByS(key($produccion), $condicion);
-                if($condicion)
-                    array_push($generadores, new Arbol(key($produccion), $produccion[key($produccion)]));
-            }
-        }
-        return $generadores;
-    }
-    /**
-     * @var string $elemento 
-     * @var bool &$esGenerado
-     */
-        public function GenerateByS(string $elemento, bool &$esGenerado): void{
-        if($elemento == $this->S)
-            $esGenerado = true;
-        else{
-            foreach ($this->P as $keyP => $produccion){
-                if($produccion[key($produccion)][0] == $elemento)
-                    self::GenerateByS(key($produccion), $esGenerado);
-            }
-        }
     }
 }
 

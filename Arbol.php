@@ -73,21 +73,49 @@ class Arbol{
         }
         return $count;
     }
-    
-    public function MostrarArbol($posicion = 0, $lineas = "",$cod = ""){
-        print "\n".$cod.$this->nodo;
-        $lineas2.= "│   ".$lineas;
-        foreach ($this->hijos as $key => $hijo) {
-            $cod = "├───";
-            if($key == count($this->hijos) -1){
-                $cod = "└───";
-                $lineas2.= "   ".$lineas;
-            }
+    # "├───" │ └
+    public function MostrarArbol($nivel = 0, $cuerpo = ""){
+
+        print $this->nodo;
+        foreach ($this->hijos as $keyH => $hijo) {
             if(gettype($hijo) == "object"){
-                $hijo->MostrarArbol($posicion++,$lineas2, $cod);
+                if($keyH == (count($this->hijos) -1) ){
+                    print "\n".$cuerpo."└───";
+                    $hijo->MostrarArbol($nivel + 1,$cuerpo."    ");
+                }
+                else{
+                    print "\n".$cuerpo."├───";
+                    $hijo->MostrarArbol($nivel + 1,$cuerpo."|   ");
+                }
             }else{
-                print "\n".$lineas.$cod.$hijo;
+                if($keyH == (count($this->hijos) -1) )
+                    print "\n".$cuerpo."└───".$hijo;
+                else
+                    print "\n".$cuerpo."├───".$hijo;
             }
         }
     }
+    /*
+    public function MostrarArbol($nivel = 0){
+
+        print $this->nodo;
+        foreach ($this->hijos as $keyH => $hijo) {
+            if(gettype($hijo) == "object"){
+                if($keyH == (count($this->hijos) -1) ){
+                    print "\n".str_repeat("    ", $nivel)."└───";
+                    $hijo->MostrarArbol($nivel + 1);
+                }
+                else{
+                    print "\n".str_repeat("│   ", $nivel)."├───";
+                    $hijo->MostrarArbol($nivel + 1);
+                }
+            }else{
+                if($keyH == (count($this->hijos) -1) )
+                    print "\n".str_repeat("    ", $nivel)."└───".$hijo;
+                else
+                    print "\n".str_repeat("│   ", $nivel)."├───".$hijo;
+            }
+        }
+    }
+    */
 }

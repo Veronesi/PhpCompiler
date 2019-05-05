@@ -4,7 +4,7 @@ namespace PhpCompiler\Variables;
 
 const variables = array(
     '<Programa>',
-    '<PorgramaFin>',
+    '<ProgramaFin>',
     '<Sentencia>',
     '<Asignacion>',
     '<Expresion>',
