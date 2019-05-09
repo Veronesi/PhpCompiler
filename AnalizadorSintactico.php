@@ -125,7 +125,7 @@ class AnalizadorSintactico{
             if($ProximoToken)
                 $i++;
         }
-        print Color::Ok("\nEl arbol generador es:\n");
+        print Color::Ok("\nPosibles Arboles generadores:\n");
         self::ArrayToTree($resultado);
 
         # 1. Verificamos si el nodo raiz pertenece a S o puede generarse por el:
@@ -152,6 +152,7 @@ class AnalizadorSintactico{
         print Color::Ok("\nRooteados: \n");
         self::ArrayToTree($resultado);
 
+        /*
         # 2. Verificamos que sean todos Terminales y no quede ninguna Variable.
         $seguir = true;
         while($seguir){
@@ -174,7 +175,8 @@ class AnalizadorSintactico{
             }
         }
         print Color::Ok("\nTerminales: \n");
-        self::ArrayToTree($resultado);      
+        self::ArrayToTree($resultado);     
+        */ 
     }
 
     public function ArrayToTree(array $array){
