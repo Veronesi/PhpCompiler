@@ -152,7 +152,7 @@ class AnalizadorSintactico{
         print Color::Ok("\nRooteados: \n");
         self::ArrayToTree($resultado);
 
-        /*
+        print Color::Ok("\nSin variables: \n");
         # 2. Verificamos que sean todos Terminales y no quede ninguna Variable.
         $seguir = true;
         while($seguir){
@@ -160,6 +160,8 @@ class AnalizadorSintactico{
             # Verificamos si los hijos del arbol sean todos terminales.
             foreach ($resultado as $keyR => $unResultado) {
                 $ArbolesTerminales = self::ForceTerminal($unResultado);
+                #($ArbolesTerminales);
+                /*
                 switch ($ArbolesTerminales) {
                     case 'IS_TERMINALIZE':
                         break;
@@ -172,11 +174,12 @@ class AnalizadorSintactico{
                     $seguir = true;
                         break;
                 }
+                */
             }
         }
-        print Color::Ok("\nTerminales: \n");
-        self::ArrayToTree($resultado);     
-        */ 
+        #print Color::Ok("\nTerminales: \n");
+        #self::ArrayToTree($resultado);     
+         
     }
 
     public function ArrayToTree(array $array){
@@ -189,8 +192,22 @@ class AnalizadorSintactico{
     public function ForceTerminal(Arbol $arbol){
         for ($pos=0; $pos < $arbol->CantidadHijos(); $pos++) { 
             $elem = $arbol->GetElemento($pos);
+            
             if (in_array($elem, $this->V)){
                 $return = array();
+                # Recorremos las producciones
+                foreach ($this->P as $keyP => $unaProduccion) {
+                    # Verificamos si este lo produce.
+                    if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
+                        $arbolNuevo = clone $arbol;
+                        $arbolNuevo->SetChild(new Arbol($elem, $unaProduccion[key($unaProduccion)]),$pos+1);
+                        array_push($return, $arbolNuevo);
+                        print "\n\n\n";
+                        $arbolNuevo->MostrarArbol();
+                    }
+                }
+                return (count($return) ? $return : 'NOT_TERMINALIZE');
+                /*
                 foreach ($this->P as $keyP => $unaProduccion) {
                     if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
                         $arbolNuevo = unserialize(serialize($arbol));
@@ -200,6 +217,7 @@ class AnalizadorSintactico{
                     }
                 }
                 return (count($return) ? $return : 'NOT_TERMINALIZE');
+                */
             }
         }
         return "IS_TERMINALIZE";

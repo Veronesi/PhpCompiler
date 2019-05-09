@@ -62,19 +62,23 @@ class Arbol{
 
     public function SetChild(Arbol $nodo , int $posicion): int{
         $count = 0;
+        $ninterno = 0;
         foreach ($this->hijos as $key => $hijo) {
             if(gettype($hijo) == "object"){
+                $ninterno++;
                 $count += $hijo->SetChild($nodo, ($posicion - $count));
             }else{
                 if($count == $posicion){
-                    $this->hijos[$count] = $nodo;
+                    $this->hijos[$ninterno] = $nodo;
                 }else
+                    $ninterno++;
                     # Pasamos al proximo elemento.
                     $count++;
             }
         }
         return $count;
     }
+
     public function MostrarArbol($nivel = 0, $cuerpo = ""){
 
         print Color::Blue($this->nodo);
