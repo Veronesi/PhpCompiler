@@ -152,7 +152,6 @@ class AnalizadorSintactico{
         print Color::Ok("\nRooteados: \n");
         self::ArrayToTree($resultado);
 
-        print Color::Ok("\nSin variables: \n");
         # 2. Verificamos que sean todos Terminales y no quede ninguna Variable.
         $seguir = true;
         while($seguir){
@@ -160,8 +159,6 @@ class AnalizadorSintactico{
             # Verificamos si los hijos del arbol sean todos terminales.
             foreach ($resultado as $keyR => $unResultado) {
                 $ArbolesTerminales = self::ForceTerminal($unResultado);
-                #($ArbolesTerminales);
-                /*
                 switch ($ArbolesTerminales) {
                     case 'IS_TERMINALIZE':
                         break;
@@ -169,16 +166,15 @@ class AnalizadorSintactico{
                         unset($resultado[$keyR]); 
                     break;
                     default:
-                    $resultado = array_merge_recursive($resultado, $ArbolesTerminales);
-                    unset($resultado[$keyR]);
-                    $seguir = true;
-                        break;
+                        unset($resultado[$keyR]);
+                        $resultado = array_merge_recursive($resultado, $ArbolesTerminales);
+                        $seguir = true;
+                    break;
                 }
-                */
             }
         }
-        #print Color::Ok("\nTerminales: \n");
-        #self::ArrayToTree($resultado);     
+        print Color::Ok("\nTerminales: \n");
+        self::ArrayToTree($resultado);     
          
     }
 
@@ -202,8 +198,6 @@ class AnalizadorSintactico{
                         $arbolNuevo = clone $arbol;
                         $arbolNuevo->SetChild(new Arbol($elem, $unaProduccion[key($unaProduccion)]),$pos+1);
                         array_push($return, $arbolNuevo);
-                        print "\n\n\n";
-                        $arbolNuevo->MostrarArbol();
                     }
                 }
                 return (count($return) ? $return : 'NOT_TERMINALIZE');
