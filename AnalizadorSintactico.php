@@ -24,8 +24,7 @@ class AnalizadorSintactico{
         array_push($this->tokens, array('ID' => 'b', 'line' => 3));
         array_push($this->tokens, array('OPERADORASIGNACION' => '=', 'line' => 3));
         array_push($this->tokens, array('NUMERO' => '3', 'line' => 4));
-        array_push($this->tokens, array('PUNTOYCOMA' => ';', 'line' => 4));
-        
+        array_push($this->tokens, array('PUNTOYCOMA' => '3', 'line' => 4));
         # Conjunto finito de terminales
         $this->T = \PhpCompiler\Terminales\terminales;
         
