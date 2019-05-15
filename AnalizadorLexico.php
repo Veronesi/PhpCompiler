@@ -1,7 +1,7 @@
 <?php
 namespace PhpCompiler;
 
-    include('Color.php');
+    include_once('Color.php');
     include('ExpReg.php');
     include('Caracter.php');
     include('PalabrasReservadas.php');
@@ -23,8 +23,8 @@ class AnalizadorLexico{
     private $caracter;
     private $advertencias;
 
-    function __construct(){
-        $this->fileName = 'codigoFuente.f';
+    function __construct(string $fileName){
+        $this->fileName = $fileName;
         $this->tokens = array();
         $this->posicion = 0;
         $this->advertencias = 0;
@@ -35,8 +35,7 @@ class AnalizadorLexico{
 
     public function Analizar(): void{
         # Archivo en donde se encuentra el codigo Fuente
-        #$file = fopen($this->fileName, 'r');
-        $file = fopen('codigoFuente.f', 'r');
+        $file = fopen($this->fileName, 'r');
         $this->row = 1;
         
         # Recorremos el archivo linea por linea
@@ -121,7 +120,7 @@ class AnalizadorLexico{
         }
     }
 }
-
+/*
 if($_SERVER['argv'][1] == '-C'){
     if($_SERVER['argv'][2]){
         if(file_exists(__DIR__."\\".$_SERVER['argv'][2])){
@@ -139,4 +138,5 @@ if($_SERVER['argv'][1] == '-C'){
 
 $AnalizadorLexico = new AnalizadorLexico();
 $AnalizadorLexico->Analizar();
+*/
 ?>

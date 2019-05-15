@@ -4,13 +4,14 @@
     include('Terminales.php');
     include('Variables.php');
     include_once('Color.php');
+    include_once('AnalizadorLexico.php');
 
     use \PhpCompiler\Producciones;
     use \PhpCompiler\Terminales;
     use \PhpCompiler\Variables;
     use \PhpCompiler\Arbol;
     use \PhpCompiler\Color;
-
+    use \PhpCompiler\AnalizadorLexico;
 $command = array(
     '-al <file>'    => " Realiza un analisis lexico",
     '-as <file>'    => " Realiza un analisis sintactico",
@@ -25,6 +26,7 @@ $command = array(
     'foo="bar"'     => " Pasa como parametro una variable"
 
 );
+$commands = ['-al', '-as', 'c', '-d', '-f', '-h', '-p', '-r', '-t', '-v'];
 
 if(in_array("-h", $_SERVER['argv'])){
     foreach ($command as $keyC => $value) {
@@ -42,6 +44,24 @@ if(in_array("-h", $_SERVER['argv'])){
         $arbol->MostrarArbol(); 
         print "\n\n"; 
     }    
+}elseif(in_array("-al", $_SERVER['argv'])){
+    $cmd = getFileName();
+    if ($cmd){
+        if(file_exists($cmd)){
+            $AnalizadorLexico = new AnalizadorLexico($cmd);
+            $AnalizadorLexico->Analizar();
+        }else
+            print Color::Error("No se a podido abrir el archivo: $cmd");
+    }else
+        print Color::Error("   Se esperaba como parametro el nombre del archivo")."\n   php ".$_SERVER['argv'][0]." -cl <file>";
+}
+
+function getFileName(){
+    foreach ($_SERVER['argv'] as $key => $value) {
+        if(preg_match('/^\w+\.f$/', $value) && $value != $_SERVER['argv'][0])
+            return $value;
+    }
+    
 }
 
 /*
