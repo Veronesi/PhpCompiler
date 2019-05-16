@@ -13,7 +13,7 @@
     use \PhpCompiler\Color;
     use \PhpCompiler\AnalizadorLexico;
 $command = array(
-    '-al <file>'    => " Realiza un analisis lexico",
+    '-l <file>'    => " Realiza un analisis lexico",
     '-as <file>'    => " Realiza un analisis sintactico",
     '-c  <file>'    => " Compliar archivo",
     '-d'            => " Modo debug (muestra paso a paso la compilacion)",
@@ -32,7 +32,7 @@ if(in_array("-h", $_SERVER['argv'])){
     foreach ($command as $keyC => $value) {
         print str_pad("\n   ".$keyC, 20).$value; 
     }
-    print "\n\n   Para mas ayuda https://github.com/Veronesi/PhpCompiler\n";
+    print "\n\n   Para mas ayuda https://github.com/Veronesi/PhpCompiler \n";
 }elseif(in_array("-t", $_SERVER['argv'])){
     foreach (\PhpCompiler\Terminales\terminales as $keyT => $value) {
         print "\n   ".$value; 
@@ -50,10 +50,13 @@ if(in_array("-h", $_SERVER['argv'])){
         if(file_exists($cmd)){
             $AnalizadorLexico = new AnalizadorLexico($cmd);
             $AnalizadorLexico->Analizar();
-        }else
-            print Color::Error("No se a podido abrir el archivo: $cmd");
+        }else{
+            $fileLev = getLevenshtein($cmd, scandir(__DIR__));
+            print Color::Error("   No se a podido abrir el archivo: $cmd");
+            if($fileLev == "..") : print ""; else: print "\n   Quizas intentaste escribir ".$fileLev; endif;
+        }
     }else
-        print Color::Error("   Se esperaba como parametro el nombre del archivo")."\n   php ".$_SERVER['argv'][0]." -cl <file>";
+        print Color::Error("   Se esperaba como parametro el nombre del archivo con extencion .f")."\n   php ".$_SERVER['argv'][0]." -cl <file>";
 }
 
 function getFileName(){
@@ -64,20 +67,16 @@ function getFileName(){
     
 }
 
-/*
-if($_SERVER['argv'][1] == '-C'){
-    if($_SERVER['argv'][2]){
-        if(file_exists(__DIR__."\\".$_SERVER['argv'][2])){
-            $AnalizadorLexico = new AnalizadorLexico();
-            $AnalizadorLexico->Analizar();
-        }else{
-            print "Error: no se a encontrado el archivo ".__DIR__."/".$_SERVER['argv'][2];
+function getLevenshtein(string $ask,array $words): string{
+    $shortest = -1;
+    foreach ($words as $word) {
+        $lev = levenshtein($ask, $word);
+        if ($lev <= $shortest || $shortest < 0) {
+            // establece la coincidencia más cercana y la distancia más corta
+            $closest  = $word;
+            $shortest = $lev;
         }
-    }else{
-        print "Falta el nombre del archivo a copilar";
     }
-}else{
-    print "Por favor ejecuta: \"php ".$_SERVER['argv'][0]." -C NombreDelArchivo.f\"";
+    return $closest;
 }
-*/
 ?>
