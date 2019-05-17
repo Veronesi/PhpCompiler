@@ -2,11 +2,13 @@
 namespace PhpCompiler;
 
 include_once('color.php');
+include_once('Debug.php');
 
 class Arbol{
     public $nodo;
     public $hijos;
-    function __construct(string $nodo = "",array $hijos = array()){
+    function __construct(string $nodo = "",array $hijos = array(), bool $debug = false){
+        $this->debug = $debug;
         $this->nodo = $nodo;
         $this->hijos = $hijos;
     }
@@ -81,34 +83,34 @@ class Arbol{
 
     public function MostrarArbol($nivel = 0, $cuerpo = ""){
 
-        print Color::Blue($this->nodo);
+        Debug::print(Color::Blue($this->nodo), $this->debug);
         foreach ($this->hijos as $keyH => $hijo) {
             if(gettype($hijo) == "object"){
                 if($keyH == (count($this->hijos) -1) ){
-                    print "\n".$cuerpo."└───";
+                    Debug::print("\n".$cuerpo."└───", $this->debug);
                     $hijo->MostrarArbol($nivel + 1,$cuerpo."    ");
                 }
                 else{
-                    print "\n".$cuerpo."├───";
+                    Debug::print("\n".$cuerpo."├───", $this->debug);
                     $hijo->MostrarArbol($nivel + 1,$cuerpo."│   ");
                 }
             }else{
                 if(preg_match('/\</',$hijo)){
                     if($keyH == (count($this->hijos) -1) )
-                        print "\n".$cuerpo."└───".Color::Advertencia($hijo);
+                        Debug::print("\n".$cuerpo."└───".Color::Advertencia($hijo), $this->debug);
                     else
-                        print "\n".$cuerpo."├───".Color::Advertencia($hijo);
+                        Debug::print("\n".$cuerpo."├───".Color::Advertencia($hijo), $this->debug);
                 }else{
                     if($hijo == 'EPSILON'){
                         if($keyH == (count($this->hijos) -1) )
-                        print "\n".$cuerpo."└───".Color::EPSILON($hijo);
+                        Debug::print("\n".$cuerpo."└───".Color::EPSILON($hijo), $this->debug);
                     else
-                        print "\n".$cuerpo."├───".Color::EPSILON($hijo);
+                        Debug::print("\n".$cuerpo."├───".Color::EPSILON($hijo), $this->debug);
                     }else{
                         if($keyH == (count($this->hijos) -1) )
-                        print "\n".$cuerpo."└───".Color::Yellow($hijo);
+                        Debug::print("\n".$cuerpo."└───".Color::Yellow($hijo), $this->debug);
                     else
-                        print "\n".$cuerpo."├───".Color::Yellow($hijo);
+                        Debug::print("\n".$cuerpo."├───".Color::Yellow($hijo), $this->debug);
                     }
                 }
             }

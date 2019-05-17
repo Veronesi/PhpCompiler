@@ -1,16 +1,6 @@
 <?php
 namespace PhpCompiler;
 
-    include_once('Color.php');
-    include('ExpReg.php');
-    include('Caracter.php');
-    include('PalabrasReservadas.php');
-
-    use \PhpCompiler\Color;
-    use \PhpCompiler\ExpReg;
-    use \PhpCompiler\Caracteres;
-    use \PhpCompiler\PalabrasReservadas;
-
 class AnalizadorLexico{
 
     private $errores;

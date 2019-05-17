@@ -1,10 +1,15 @@
 <?php
-    include('Arbol.php');
-    include('Producciones.php');
-    include('Terminales.php');
-    include('Variables.php');
+
+    include_once('Arbol.php');
+    include_once('Producciones.php');
+    include_once('Terminales.php');
+    include_once('Variables.php');
     include_once('Color.php');
     include_once('AnalizadorLexico.php');
+    include_once('AnalizadorSintactico.php');
+    include_once('ExpReg.php');
+    include_once('Caracter.php');
+    include_once('Debug.php');
 
     use \PhpCompiler\Producciones;
     use \PhpCompiler\Terminales;
@@ -12,6 +17,11 @@
     use \PhpCompiler\Arbol;
     use \PhpCompiler\Color;
     use \PhpCompiler\AnalizadorLexico;
+    use \PhpCompiler\AnalizadorSintactico;
+    use \PhpCompiler\ExpReg;
+    use \PhpCompiler\Caracteres;
+    use \PhpCompiler\Debug;
+
 $command = array(
     '-l <file>'    => " Realiza un analisis lexico",
     '-as <file>'    => " Realiza un analisis sintactico",
@@ -45,7 +55,7 @@ if(in_array("-h", $_SERVER['argv'])){
         print "\n\n"; 
     }    
 }elseif(in_array("-al", $_SERVER['argv'])){
-    $cmd = getFileName();
+    $cmd = getFileName('f');
     if ($cmd){
         if(file_exists($cmd)){
             $AnalizadorLexico = new AnalizadorLexico($cmd);
@@ -57,11 +67,26 @@ if(in_array("-h", $_SERVER['argv'])){
         }
     }else
         print Color::Error("   Se esperaba como parametro el nombre del archivo con extencion .f")."\n   php ".$_SERVER['argv'][0]." -cl <file>";
+}elseif(in_array("-as", $_SERVER['argv'])){
+    $cmd = getFileName('f2');
+    if ($cmd){
+        if(file_exists($cmd)){
+            $debug = false;
+            if(in_array("-d", $_SERVER['argv'])) : $debug = true; endif;
+            $AnalizadorSintactico = new AnalizadorSintactico($cmd, $debug);
+            $AnalizadorSintactico->Analizar();
+        }else{
+            $fileLev = getLevenshtein($cmd, scandir(__DIR__));
+            print Color::Error("   No se a podido abrir el archivo: $cmd");
+            if($fileLev == "..") : print ""; else: print "\n   Quizas intentaste escribir ".$fileLev; endif;
+        }
+    }else
+        print Color::Error("   Se esperaba como parametro el nombre del archivo con extencion .f2")."\n   php ".$_SERVER['argv'][0]." -cl <file>";
 }
 
-function getFileName(){
+function getFileName($ext){
     foreach ($_SERVER['argv'] as $key => $value) {
-        if(preg_match('/^\w+\.f$/', $value) && $value != $_SERVER['argv'][0])
+        if(preg_match('/^\w+\.'.$ext.'$/', $value) && $value != $_SERVER['argv'][0])
             return $value;
     }
     
@@ -80,3 +105,5 @@ function getLevenshtein(string $ask,array $words): string{
     return $closest;
 }
 ?>
+
+
