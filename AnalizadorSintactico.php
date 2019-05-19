@@ -76,6 +76,9 @@ class AnalizadorSintactico{
                             $ProximoToken = false;
                         }else{
                             Debug::print(Color::Error("\nLo eliminamos ya que nadie lo genera."), $this->debug);
+                            if(count($resultado) == 1){
+                                print("\n".Color::Advertencia("\nError de Analisis").": error sintactico, no se esperaba '".current($this->tokens[$i])."' en ".__DIR__."\\".$this->fileName." en Linea ".$this->tokens[$i]->line."\n");
+                            }
                         }
                         # Eliminamos el arbol viejo.
                         Debug::print(Color::Error("\nSe a eliminado el arbol $keyR."), $this->debug);
@@ -91,7 +94,7 @@ class AnalizadorSintactico{
                             Debug::print(Color::Error("\nNo coinciden los tokens"), $this->debug);
                             # Verificamos si era el ultimo posible arbol.
                             if(count($resultado) == 1)
-                                print("\n".Color::Advertencia("\nError de Analisis").": error sintactico, no se esperaba '".key($this->tokens[$i])."' en ".__DIR__."\\".$this->fileName." en Linea ".$this->tokens[$i]->line."\n");
+                                print("\n".Color::Advertencia("\nError de Analisis").": error sintactico, no se esperaba '".current($this->tokens[$i])."' en ".__DIR__."\\".$this->fileName." en Linea ".$this->tokens[$i]->line."\n");
                                 # Eliminamos el arbol.
                             unset($resultado[$keyR]);
                         }else

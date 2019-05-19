@@ -12,6 +12,7 @@ class AnalizadorLexico{
     private $palabrasReservadas;
     private $caracter;
     private $advertencias;
+    private $yes;
 
     function __construct(string $fileName){
         $this->fileName = $fileName;
@@ -23,7 +24,8 @@ class AnalizadorLexico{
         $this->caracter = Caracteres\caracter;
     }
 
-    public function Analizar(): bool{
+    public function Analizar(bool $yes = false): bool{
+        $this->yes = $yes;
         # Archivo en donde se encuentra el codigo Fuente
         $file = fopen($this->fileName, 'r');
         $this->row = 1;
@@ -104,10 +106,13 @@ class AnalizadorLexico{
         else{
             print "\n".Color::Advertencia("Error de Analisis").": error lexico, no se esperaba '".$palabra."' en ".__DIR__.$this->fileName." en Linea ".$this->row;
             print "\n";
-            $line = readline("Desea eliminarlo y continuar con el analisis? [Y/n]: ");
-            if($line == "n")
-                $this->errores++;
-            else
+            if(!$this->yes){
+                $line = readline("Desea eliminarlo y continuar con el analisis? [Y/n]: ");
+                if($line == "n")
+                    $this->errores++;
+                else
+                    $this->advertencias++;
+            }else
                 $this->advertencias++;
         }
     }

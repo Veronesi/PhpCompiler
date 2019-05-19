@@ -1,5 +1,5 @@
 <?php
-
+    
     include_once('Arbol.php');
     include_once('Producciones.php');
     include_once('Terminales.php');
@@ -38,7 +38,8 @@ $command = array(
     '-y'            => " Acepta todas las preguntas que el complidaor hara",
     'foo="bar"'     => " Pasa como parametro una variable"
 );
-$commands = ['-al', '-as', 'c', '-d', '-f', '-h', '-p', '-r', '-t', '-v'];
+
+$commands = ['-al', '-as', 'c', '-d', '-f', '-h', '-p', '-r', '-t', '-v', '-y'];
 
 if(in_array("-h", $_SERVER['argv'])){
     foreach ($command as $keyC => $value) {
@@ -60,8 +61,10 @@ if(in_array("-h", $_SERVER['argv'])){
     $cmd = getFileName('f');
     if ($cmd){
         if(file_exists($cmd)){
+            $yes = false;
+            if(in_array("-y", $_SERVER['argv'])) : $yes = true; endif;
             $AnalizadorLexico = new AnalizadorLexico($cmd);
-            $AnalizadorLexico->Analizar();
+            $AnalizadorLexico->Analizar($yes);
         }else{
             $fileLev = getLevenshtein($cmd, scandir(__DIR__));
             print Color::Error("   No se a podido abrir el archivo: $cmd");
@@ -88,8 +91,10 @@ if(in_array("-h", $_SERVER['argv'])){
     $cmd = getFileName('f');
     if ($cmd){
         if(file_exists($cmd)){
+            $yes = false;
+            if(in_array("-y", $_SERVER['argv'])) : $yes = true; endif;
             $AnalizadorLexico = new AnalizadorLexico($cmd);
-            if($AnalizadorLexico->Analizar()){
+            if($AnalizadorLexico->Analizar($yes)){
                 $debug = false;
                 if(in_array("-d", $_SERVER['argv'])) : $debug = true; endif;
                 $AnalizadorSintactico = new AnalizadorSintactico($cmd."2", $debug);
