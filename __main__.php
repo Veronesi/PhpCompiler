@@ -10,6 +10,7 @@
     include_once('ExpReg.php');
     include_once('Caracter.php');
     include_once('Debug.php');
+    include_once('PalabrasReservadas.php');
 
     use \PhpCompiler\Producciones;
     use \PhpCompiler\Terminales;
@@ -21,9 +22,10 @@
     use \PhpCompiler\ExpReg;
     use \PhpCompiler\Caracteres;
     use \PhpCompiler\Debug;
+    use \PhpCompiler\PalabrasReservadas;
 
 $command = array(
-    '-l <file>'    => " Realiza un analisis lexico",
+    '-l <file>'     => " Realiza un analisis lexico",
     '-as <file>'    => " Realiza un analisis sintactico",
     '-c  <file>'    => " Compliar archivo",
     '-d'            => " Modo debug (muestra paso a paso la compilacion)",
@@ -33,8 +35,8 @@ $command = array(
     '-r  <file>'    => " Ejecuta un archivo compilado",
     '-t'            => " Muestra la lista de terminales",
     '-v'            => " Muestra la lista de las variables",
+    '-y'            => " Acepta todas las preguntas que el complidaor hara",
     'foo="bar"'     => " Pasa como parametro una variable"
-
 );
 $commands = ['-al', '-as', 'c', '-d', '-f', '-h', '-p', '-r', '-t', '-v'];
 
@@ -82,6 +84,24 @@ if(in_array("-h", $_SERVER['argv'])){
         }
     }else
         print Color::Error("   Se esperaba como parametro el nombre del archivo con extencion .f2")."\n   php ".$_SERVER['argv'][0]." -cl <file>";
+}elseif(in_array("-c", $_SERVER['argv'])){
+    $cmd = getFileName('f');
+    if ($cmd){
+        if(file_exists($cmd)){
+            $AnalizadorLexico = new AnalizadorLexico($cmd);
+            if($AnalizadorLexico->Analizar()){
+                $debug = false;
+                if(in_array("-d", $_SERVER['argv'])) : $debug = true; endif;
+                $AnalizadorSintactico = new AnalizadorSintactico($cmd."2", $debug);
+                $AnalizadorSintactico->Analizar(); 
+            }
+        }else{
+            $fileLev = getLevenshtein($cmd, scandir(__DIR__));
+            print Color::Error("   No se a podido abrir el archivo: $cmd");
+            if($fileLev == "..") : print ""; else: print "\n   Quizas intentaste escribir ".$fileLev; endif;
+        }
+    }else
+        print Color::Error("   Se esperaba como parametro el nombre del archivo con extencion .f")."\n   php ".$_SERVER['argv'][0]." -cl <file>";
 }
 
 function getFileName($ext){

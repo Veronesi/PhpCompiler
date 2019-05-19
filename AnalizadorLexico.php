@@ -23,7 +23,7 @@ class AnalizadorLexico{
         $this->caracter = Caracteres\caracter;
     }
 
-    public function Analizar(): void{
+    public function Analizar(): bool{
         # Archivo en donde se encuentra el codigo Fuente
         $file = fopen($this->fileName, 'r');
         $this->row = 1;
@@ -67,10 +67,12 @@ class AnalizadorLexico{
             $msg = " advertencia";
             if ($this->advertencias != 1) : $msg.= "s"; endif;
             print Color::Advertencia($this->advertencias.$msg);
+            return true;
         }else{
             $msg = " error";
             if ($this->errores > 1) : $msg.= "es"; endif;
             print Color::Error($this->errores.$msg);
+            return false;
         }
     }
     /**

@@ -3,6 +3,7 @@ namespace PhpCompiler;
 
 class AnalizadorSintactico{
 
+    private $fileName;
     private $tokens;
     private $T;
     private $V;
@@ -12,7 +13,7 @@ class AnalizadorSintactico{
     private $debug;
     function __construct(string $fileName, bool $debug){
         $this->debug = $debug;
-
+        $this->fileName = $fileName;
         $file = fopen($fileName, 'r');
         $json = fread($file, filesize($fileName));
         fclose($file);
@@ -90,8 +91,8 @@ class AnalizadorSintactico{
                             Debug::print(Color::Error("\nNo coinciden los tokens"), $this->debug);
                             # Verificamos si era el ultimo posible arbol.
                             if(count($resultado) == 1)
-                                Debug::print("\n".Color::Advertencia("\nError de Analisis").": error sintactico, no se esperaba '".$this->tokens[$i][key($this->tokens[$i])]."' en ".__DIR__."\\codigoFuente.f"." en Linea ".$this->tokens[$i]['line']."\n", $this->debug);
-                            # Eliminamos el arbol.
+                                print("\n".Color::Advertencia("\nError de Analisis").": error sintactico, no se esperaba '".key($this->tokens[$i])."' en ".__DIR__."\\".$this->fileName." en Linea ".$this->tokens[$i]->line."\n");
+                                # Eliminamos el arbol.
                             unset($resultado[$keyR]);
                         }else
                             Debug::print(Color::Ok("\nCoinciden los tokens"), $this->debug);
@@ -176,9 +177,9 @@ class AnalizadorSintactico{
         self::ArrayToTree($resultado);     
 
         if(count($resultado))
-            print Color::Ok("\nEl analisis Lexico a finalizado con exito!");
+            print "\nEl analisis Sintactico a finalizado con ".Color::Advertencia("0 advertencias");
         else
-            print Color::Error("\nError en el analisis lexico");
+            print Color::Error("\nError en el analisis Sintactico");
     }
 
     public function ArrayToTree(array $array){
