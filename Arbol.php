@@ -75,7 +75,8 @@ class Arbol{
                 }else
                     $ninterno++;
                     # Pasamos al proximo elemento.
-                    $count++;
+                    if($hijo != 'EPSILON')
+                        $count++;
             }
         }
         return $count;

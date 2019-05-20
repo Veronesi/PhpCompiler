@@ -11,6 +11,7 @@ class AnalizadorSintactico{
     private $S;
     private $P2;
     private $debug;
+    
     function __construct(string $fileName, bool $debug){
         $this->debug = $debug;
         $this->fileName = $fileName;
@@ -54,7 +55,7 @@ class AnalizadorSintactico{
             $ProximoToken = true;
             Debug::print("\n-------------------------------------------", $this->debug);
             Debug::print("\nToken a analizar: ".key($this->tokens[$i]), $this->debug);
-            
+            self::ArrayToTree($resultado);
                 # Recorremos las producciones obtenemos el i-esimo elemento del arbol.
                 foreach ($resultado as $keyR => $unResultado) {
                     $nodo = $unResultado->GetElemento($i);
@@ -109,9 +110,9 @@ class AnalizadorSintactico{
                         if(count($subProducciones) > 0){
                             foreach ($subProducciones as $keySP => $unaSubProduccion){
                                 $arbolNuevo = unserialize(serialize($unResultado));
-                                Debug::print("\nArbol nuevo:\n\n\n\n", $this->debug);
-                                $arbolNuevo->MostrarArbol();
+                                Debug::print("\nArbol nuevo: en pos ".($i)."\n\n", $this->debug);
                                 $arbolNuevo->SetChild($unaSubProduccion, $i);
+                                $arbolNuevo->MostrarArbol();
                                 array_push($resultado, $arbolNuevo);
                             }
                             # Eliminamos el arbol viejo.
