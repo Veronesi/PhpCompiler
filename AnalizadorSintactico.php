@@ -131,9 +131,8 @@ class AnalizadorSintactico{
             if($ProximoToken)
                 $i++;
         }
-        Debug::print(Color::Ok("\nPosibles Arboles generadores:\n"), $this->debug);
-        self::ArrayToTree($resultado);
-
+        Debug::print(Color::Blue("\n\nVerificamos si es generado por el simbolo inicial \n"), $this->debug);
+        self::ArrayToTree($resultado, true);
         # 1. Verificamos si el nodo raiz pertenece a S o puede generarse por el:
         $seguir = true;
         while($seguir){
@@ -155,18 +154,21 @@ class AnalizadorSintactico{
                 }
             }
         }
-        Debug::print(Color::Ok("\nRooteados: \n"), $this->debug);
-        self::ArrayToTree($resultado);
-
+        Debug::print(Color::Blue("\n\nCompletamos los arboles para que no quede ninguna Variable\n"), $this->debug);
+        self::ArrayToTree($resultado, true);
         # 2. Verificamos que sean todos Terminales y no quede ninguna Variable.
         $seguir = true;
         while($seguir){
             $seguir = false;
             # Verificamos si los hijos del arbol sean todos terminales.
             foreach ($resultado as $keyR => $unResultado) {
+                Debug::print("\n  - . - . - . - . -Arbol: $keyR - . - . - . - . - . -", $this->debug);
+                self::ArrayToTree($resultado, true);
                 $ArbolesTerminales = self::ForceTerminal($unResultado);
+                exit;
                 switch ($ArbolesTerminales) {
                     case 'IS_TERMINALIZE':
+                        print "is terinal";
                         break;
                     case 'NOT_TERMINALIZE':
                         unset($resultado[$keyR]); 
@@ -199,35 +201,73 @@ class AnalizadorSintactico{
     }
 
     public function ForceTerminal(Arbol $arbol){
-        for ($pos=0; $pos < $arbol->CantidadHijos(); $pos++) { 
-            $elem = $arbol->GetElemento($pos);
-            
-            if (in_array($elem, $this->V)){
-                $return = array();
-                # Recorremos las producciones
-                foreach ($this->P as $keyP => $unaProduccion) {
-                    # Verificamos si este lo produce.
-                    if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
-                        $arbolNuevo = clone $arbol;
-                        $arbolNuevo->SetChild(new Arbol($elem, $unaProduccion[key($unaProduccion)]),$pos+1, $this->debug);
-                        array_push($return, $arbolNuevo);
-                    }
+        # El unico elemento que puede ser una variable es el ultimo. 
+        $elem = $arbol->GetElemento($arbol->CantidadHijos() -1);
+        Debug::print("\nElemento a analizar: ".$elem." (Posicion: ".($arbol->CantidadHijos() -1).")"."\n", $this->debug);
+
+        if (in_array($elem, $this->V)){
+            Debug::print("\nLa siguiente produccion es una variable", $this->debug);
+            # Verificamos si produce un terminal.
+            $noTerminales = array();
+            foreach ($this->P as $keyP => $unaProduccion) {
+                if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
+                    $hijo = New Arbol($elem,$unaProduccion[key($unaProduccion)], $this->debug);
+                    array_push($noTerminales, $hijo);
                 }
-                return (count($return) ? $return : 'NOT_TERMINALIZE');
-                /*
-                foreach ($this->P as $keyP => $unaProduccion) {
-                    if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
-                        $arbolNuevo = unserialize(serialize($arbol));
-                        $subArbol = new Arbol(key($unaProduccion) ,$unaProduccion[key($unaProduccion)]);
-                        $arbolNuevo->SetChild($subArbol, $pos -2);  # Arreglar esta linea
-                        array_push($return, $arbolNuevo);
-                    }
-                }
-                return (count($return) ? $return : 'NOT_TERMINALIZE');
-                */
             }
+            if(count($noTerminales)){
+                Debug::print(Color::Ok("\nProducciones que no generan terminales"), $this->debug);
+                Debug::print("\n", $this->debug);
+                self::ArrayToTree($noTerminales);
+            }else{
+                Debug::print(Color::Ok("\nTodas las producciones generan terminales"), $this->debug);
+            }
+        }else{
+            Debug::print(Color::Ok("\nEs un terminal"), $this->debug);
         }
-        return "IS_TERMINALIZE";
+        // --------------------------------------------------------------------------
+        //for ($pos=0; $pos < $arbol->CantidadHijos(); $pos++) { 
+        //    $elem = $arbol->GetElemento($pos);
+        //    Debug::print("\nElemento a analizar: ".$elem."\n", $this->debug);
+        //    if (in_array($elem, $this->V)){
+        //        Debug::print(Color::Error("\nEs una variable"), $this->debug);
+        //        $return = array();
+        //        # Recorremos las producciones
+        //        foreach ($this->P as $keyP => $unaProduccion) {
+        //            # Verificamos si este lo produce.
+        //            /*
+        //
+        //                    EL ERROR ESTA ACA, EL ARBOL NO SE MODIFICA Y NO SE INSERTA EL NUEVO HIJO Y POR ESO ENTRA EN UN BUCLE.
+        //
+        //            */
+        //            if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
+        //                Debug::print(Color::Ok("\nLa siguiente produccion no genera ningun terminal"), $this->debug);
+        //                Debug::print("\n\n", $this->debug);
+        //                $hijo = New Arbol($elem,$unaProduccion[key($unaProduccion)], $this->debug);
+        //                $hijo->MostrarArbol();
+        //                $arbolNuevo = clone $arbol;
+        //                $arbolNuevo->SetChild(new Arbol($elem, $unaProduccion[key($unaProduccion)]),$pos+1, $this->debug);
+        //                array_push($return, $arbolNuevo);
+        //            }
+        //        }
+        //        //self::ArrayToTree($return);
+        //        return (count($return) ? $return : 'NOT_TERMINALIZE');
+        //        /*
+        //        foreach ($this->P as $keyP => $unaProduccion) {
+        //            if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
+        //                $arbolNuevo = unserialize(serialize($arbol));
+        //                $subArbol = new Arbol(key($unaProduccion) ,$unaProduccion[key($unaProduccion)]);
+        //                $arbolNuevo->SetChild($subArbol, $pos -2);  # Arreglar esta linea
+        //                array_push($return, $arbolNuevo);
+        //            }
+        //        }
+        //        return (count($return) ? $return : 'NOT_TERMINALIZE');
+        //        */
+        //    }else{
+        //        Debug::print("\nEs un terminal", $this->debug);
+        //    }
+        //}
+        //return "IS_TERMINALIZE";
     }
 
     public function ForceRoot(Arbol $arbol){
