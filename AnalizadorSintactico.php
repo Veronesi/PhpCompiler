@@ -164,28 +164,33 @@ class AnalizadorSintactico{
             foreach ($resultado as $keyR => $unResultado) {
                 Debug::print("\n  - . - . - . - . -Arbol: $keyR - . - . - . - . - . -", $this->debug);
                 self::ArrayToTree($resultado, true);
-                $ArbolesTerminales = self::ForceTerminal($unResultado);
-                exit;
-                switch ($ArbolesTerminales) {
+                $SubArbolesTerminales = self::ForceTerminal($unResultado);
+                switch ($SubArbolesTerminales) {
                     case 'IS_TERMINALIZE':
-                        print "is terinal";
                         break;
                     case 'NOT_TERMINALIZE':
                         unset($resultado[$keyR]); 
                     break;
                     default:
+                        # Insertamos los nuevos hijos en este arbol.
+                        foreach ($SubArbolesTerminales as $keyS => $arbol) {
+                            $arbolNuevo = unserialize(serialize($unResultado));
+                            $arbolNuevo->SetChild($arbol, $unResultado->CantidadHijos() -1);
+                            $arbolNuevo->MostrarArbol();
+                            array_push($resultado, $arbolNuevo);
+                        }
                         unset($resultado[$keyR]);
-                        $resultado = array_merge_recursive($resultado, $ArbolesTerminales);
+                        //$resultado = array_merge_recursive($resultado, $ArbolesTerminales);
                         $seguir = true;
                     break;
                 }
             }
         }
-        Debug::print(Color::Ok("\nTerminales: \n"), $this->debug);
+        Debug::print(Color::Ok("\nArbol generador: \n"), true);
         self::ArrayToTree($resultado);     
 
         if(count($resultado))
-            print "\nEl analisis Sintactico a finalizado con ".Color::Advertencia("0 advertencias");
+            print "\n\nEl analisis Sintactico a finalizado con ".Color::Advertencia("0 advertencias");
         else
             print Color::Error("\nError en el analisis Sintactico");
     }
@@ -193,7 +198,7 @@ class AnalizadorSintactico{
     public function ArrayToTree(array $array, bool $showKeyNumber = false){
         foreach ($array as $keyA => $arbol) {
             if($showKeyNumber)
-            Debug::print("\n\nArbol $keyA):\n", $this->debug);
+                Debug::print("\n\nArbol $keyA):\n", $this->debug);
             else
                 Debug::print("\n\n", $this->debug);
             $arbol->MostrarArbol();
@@ -219,10 +224,13 @@ class AnalizadorSintactico{
                 Debug::print(Color::Ok("\nProducciones que no generan terminales"), $this->debug);
                 Debug::print("\n", $this->debug);
                 self::ArrayToTree($noTerminales);
+                return $noTerminales;
             }else{
-                Debug::print(Color::Ok("\nTodas las producciones generan terminales"), $this->debug);
+                Debug::print(Color::Error("\nTodas las producciones generan terminales"), $this->debug);
+                return 'NOT_TERMINALIZE';
             }
         }else{
+            return 'IS_TERMINALIZE';
             Debug::print(Color::Ok("\nEs un terminal"), $this->debug);
         }
         // --------------------------------------------------------------------------
