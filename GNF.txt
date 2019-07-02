@@ -8,8 +8,7 @@
 
 <Expresion> 				::= <ExpresionAritmetica> | <ExpresionLista>
 	
-<ExpresionAritmetica>		::= <ExpresionAritmetica> "Operador" <ExpresionAritmetica> | "first" "(" <ExpresionLista> ")" <ExpresionAritmeticaFinal> | 
-								"Numero" <ExpresionAritmeticaFinal> | "id" <ExpresionAritmeticaFinal> | "(" <ExpresionAritmetica> ")" <ExpresionAritmeticaFinal>
+<ExpresionAritmetica>		::= <ExpresionAritmetica> "Operador" <ExpresionAritmetica> | "first" "(" <ExpresionLista> ")" <ExpresionAritmeticaFinal> | "Numero" <ExpresionAritmeticaFinal> | "id" <ExpresionAritmeticaFinal> | "(" <ExpresionAritmetica> ")" <ExpresionAritmeticaFinal>
 
 <ExpresionAritmeticaFinal>	::=	"Operador" <ExpresionAritmetica> | ε
 

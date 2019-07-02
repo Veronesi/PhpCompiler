@@ -25,7 +25,7 @@
     use \PhpCompiler\PalabrasReservadas;
 
 $command = array(
-    '-l <file>'     => " Realiza un analisis lexico",
+    '-al <file>'     => " Realiza un analisis lexico",
     '-as <file>'    => " Realiza un analisis sintactico",
     '-c  <file>'    => " Compliar archivo",
     '-d'            => " Modo debug (muestra paso a paso la compilacion)",
