@@ -19,12 +19,7 @@ class AnalizadorSintactico{
         # Tokens
         
         $this->tokens = json_decode($json);
-        /*
-        array_push($this->tokens, array('ID' => 'b', 'line' => 3));
-        array_push($this->tokens, array('OPERADORASIGNACION' => '=', 'line' => 3));
-        array_push($this->tokens, array('NUMERO' => '3', 'line' => 4));
-        array_push($this->tokens, array('PUNTOYCOMA' => '3', 'line' => 4));
-        */
+
         # Conjunto finito de terminales
         $this->T = \PhpCompiler\Terminales\terminales;
         
@@ -52,7 +47,7 @@ class AnalizadorSintactico{
         while($i< count($this->tokens)){
             $ProximoToken = true;
             Debug::print("\n-------------------------------------------");
-            Debug::print("\nToken a analizar: ".key($this->tokens[$i]));
+            Debug::print("\nToken a analizar: ".key($this->tokens[$i])." '".$this->tokens[$i]->{key($this->tokens[$i])}."'");
             self::ArrayToTree($resultado, true);
                 # Recorremos las producciones obtenemos el i-esimo elemento del arbol.
                 foreach ($resultado as $keyR => $unResultado) {
