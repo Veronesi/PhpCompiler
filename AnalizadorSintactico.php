@@ -10,10 +10,8 @@ class AnalizadorSintactico{
     private $P;
     private $S;
     private $P2;
-    private $debug;
     
-    function __construct(string $fileName, bool $debug){
-        $this->debug = $debug;
+    function __construct(string $fileName){
         $this->fileName = $fileName;
         $file = fopen($fileName, 'r');
         $json = fread($file, filesize($fileName));
@@ -53,16 +51,16 @@ class AnalizadorSintactico{
 
         while($i< count($this->tokens)){
             $ProximoToken = true;
-            Debug::print("\n-------------------------------------------", $this->debug);
-            Debug::print("\nToken a analizar: ".key($this->tokens[$i]), $this->debug);
+            Debug::print("\n-------------------------------------------");
+            Debug::print("\nToken a analizar: ".key($this->tokens[$i]));
             self::ArrayToTree($resultado, true);
                 # Recorremos las producciones obtenemos el i-esimo elemento del arbol.
                 foreach ($resultado as $keyR => $unResultado) {
-                    Debug::print("\n  - . - . - . - . -Arbol: $keyR - . - . - . - . - . -", $this->debug);
-                    Debug::print("\nCantidad de hijos: ".$unResultado->CantidadHijos(), $this->debug);
+                    Debug::print("\n  - . - . - . - . -Arbol: $keyR - . - . - . - . - . -");
+                    Debug::print("\nCantidad de hijos: ".$unResultado->CantidadHijos());
                     if($unResultado->CantidadHijos() -1 < $i){
                         # el arbol esta completo.
-                        Debug::print(Color::Ok("\nEl arbol esta completo"), $this->debug);
+                        Debug::print(Color::Ok("\nEl arbol esta completo"));
                         # Buscamos quienes producen a la raiz del arbol.
                         $nuevasRaices = self::Generadores($unResultado->nodo);
                         if(count($nuevasRaices) > 0){
@@ -74,43 +72,43 @@ class AnalizadorSintactico{
                             }
                             $ProximoToken = false;
                         }else{
-                            Debug::print(Color::Error("\nLo eliminamos ya que nadie lo genera."), $this->debug);
+                            Debug::print(Color::Error("\nLo eliminamos ya que nadie lo genera."));
                             if(count($resultado) == 1){
                                 print("\n".Color::Advertencia("\nError de Analisis").": error sintactico, no se esperaba '".current($this->tokens[$i])."' en ".__DIR__."\\".$this->fileName." en Linea ".$this->tokens[$i]->line."\n");
                             }
                         }
                         # Eliminamos el arbol viejo.
-                        Debug::print(Color::Error("\nSe a eliminado el arbol $keyR."), $this->debug);
+                        Debug::print(Color::Error("\nSe a eliminado el arbol $keyR."));
                         unset($resultado[$keyR]);
 
                     }else{
                         $nodo = $unResultado->GetElemento($i);
-                        Debug::print("\nNodo: $nodo", $this->debug);
+                        Debug::print("\nNodo: $nodo");
                         # Verificamos que es.
                         if(in_array($nodo, $this->T)){
                             # Es un terminal.
-                            Debug::print("\nEl nodo es un terminal", $this->debug);
+                            Debug::print("\nEl nodo es un terminal");
                             # Verificamos si es distinto al token.
                             if($nodo != key($this->tokens[$i])){
-                                Debug::print(Color::Error("\nNo coinciden los tokens"), $this->debug);
+                                Debug::print(Color::Error("\nNo coinciden los tokens"));
                                 # Verificamos si era el ultimo posible arbol.
                                 if(count($resultado) == 1)
                                     print("\n".Color::Advertencia("\nError de Analisis").": error sintactico, no se esperaba '".current($this->tokens[$i])."' en ".__DIR__."\\".$this->fileName." en Linea ".$this->tokens[$i]->line."\n");
                                     # Eliminamos el arbol.
                                 unset($resultado[$keyR]);
                             }else
-                                Debug::print(Color::Ok("\nCoinciden los tokens"), $this->debug);
+                                Debug::print(Color::Ok("\nCoinciden los tokens"));
 
                         }elseif(in_array($nodo, $this->V)){
                             # El nodo no es una Variable.
-                            Debug::print("\nEl nodo es una Variable", $this->debug);
+                            Debug::print("\nEl nodo es una Variable");
                             # Buscamos las producciones que generan a esta variable.
                             $subProducciones = self::Genera($nodo);
                             # Insertamos los subarboles en el arbol viejo
                             if(count($subProducciones) > 0){
                                 foreach ($subProducciones as $keySP => $unaSubProduccion){
                                     $arbolNuevo = unserialize(serialize($unResultado));
-                                    Debug::print("\nArbol nuevo: en pos ".($i)."\n\n", $this->debug);
+                                    Debug::print("\nArbol nuevo: en pos ".($i)."\n\n");
                                     $arbolNuevo->SetChild($unaSubProduccion, $i);
                                     $arbolNuevo->MostrarArbol();
                                     array_push($resultado, $arbolNuevo);
@@ -119,7 +117,7 @@ class AnalizadorSintactico{
                                 unset($resultado[$keyR]);
                                 $ProximoToken = false;
                             }else{
-                                Debug::print(Color::Error("\nLo eliminamos ya que nadie lo genera."), $this->debug);
+                                Debug::print(Color::Error("\nLo eliminamos ya que nadie lo genera."));
                                 # Lo eliminamos ya que nadie lo genera.
                                 unset($resultado[$keyR]);
                             }
@@ -131,7 +129,7 @@ class AnalizadorSintactico{
             if($ProximoToken)
                 $i++;
         }
-        Debug::print(Color::Blue("\n\nVerificamos si es generado por el simbolo inicial \n"), $this->debug);
+        Debug::print(Color::Blue("\n\nVerificamos si es generado por el simbolo inicial \n"));
         self::ArrayToTree($resultado, true);
         # 1. Verificamos si el nodo raiz pertenece a S o puede generarse por el:
         $seguir = true;
@@ -154,7 +152,7 @@ class AnalizadorSintactico{
                 }
             }
         }
-        Debug::print(Color::Blue("\n\nCompletamos los arboles para que no quede ninguna Variable\n"), $this->debug);
+        Debug::print(Color::Blue("\n\nCompletamos los arboles para que no quede ninguna Variable\n"));
         self::ArrayToTree($resultado, true);
         # 2. Verificamos que sean todos Terminales y no quede ninguna Variable.
         $seguir = true;
@@ -162,14 +160,14 @@ class AnalizadorSintactico{
             $seguir = false;
             # Verificamos si los hijos del arbol sean todos terminales.
             foreach ($resultado as $keyR => $unResultado) {
-                Debug::print("\n  - . - . - . - . -Arbol: $keyR - . - . - . - . - . -", $this->debug);
+                Debug::print("\n  - . - . - . - . -Arbol: $keyR - . - . - . - . - . -");
                 self::ArrayToTree($resultado, true);
                 $SubArbolesTerminales = self::ForceTerminal($unResultado);
                 switch ($SubArbolesTerminales) {
                     case 'IS_TERMINALIZE':
                         break;
                     case 'NOT_TERMINALIZE':
-                        unset($resultado[$keyR]); 
+                        unset($resultado[$keyR]);
                     break;
                     default:
                         # Insertamos los nuevos hijos en este arbol.
@@ -186,11 +184,16 @@ class AnalizadorSintactico{
                 }
             }
         }
-        Debug::print(Color::Ok("\nArbol generador: \n"), true);
-        self::ArrayToTree($resultado);     
-
-        if(count($resultado))
+        Debug::print(Color::Ok("\nArbol generador: \n"));
+        self::ArrayToTree($resultado);
+        if(count($resultado)){
             print "\n\nEl analisis Sintactico a finalizado con ".Color::Advertencia("0 advertencias");
+            # Guardamos la lista de Tokens en un archivo
+            $f = fopen(substr($this->fileName,0,-1)."3", 'w+');
+            fwrite($f, serialize($resultado));
+            fclose($f);
+        }
+            
         else
             print Color::Error("\nError en el analisis Sintactico");
     }
@@ -198,9 +201,9 @@ class AnalizadorSintactico{
     public function ArrayToTree(array $array, bool $showKeyNumber = false){
         foreach ($array as $keyA => $arbol) {
             if($showKeyNumber)
-                Debug::print("\n\nArbol $keyA):\n", $this->debug);
+                Debug::print("\n\nArbol $keyA):\n");
             else
-                Debug::print("\n\n", $this->debug);
+                Debug::print("\n\n");
             $arbol->MostrarArbol();
         }
     }
@@ -208,74 +211,31 @@ class AnalizadorSintactico{
     public function ForceTerminal(Arbol $arbol){
         # El unico elemento que puede ser una variable es el ultimo. 
         $elem = $arbol->GetElemento($arbol->CantidadHijos() -1);
-        Debug::print("\nElemento a analizar: ".$elem." (Posicion: ".($arbol->CantidadHijos() -1).")"."\n", $this->debug);
+        Debug::print("\nElemento a analizar: ".$elem." (Posicion: ".($arbol->CantidadHijos() -1).")"."\n");
 
         if (in_array($elem, $this->V)){
-            Debug::print("\nLa siguiente produccion es una variable", $this->debug);
+            Debug::print("\nLa siguiente produccion es una variable");
             # Verificamos si produce un terminal.
             $noTerminales = array();
             foreach ($this->P as $keyP => $unaProduccion) {
                 if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
-                    $hijo = New Arbol($elem,$unaProduccion[key($unaProduccion)], $this->debug);
+                    $hijo = New Arbol($elem,$unaProduccion[key($unaProduccion)]);
                     array_push($noTerminales, $hijo);
                 }
             }
             if(count($noTerminales)){
-                Debug::print(Color::Ok("\nProducciones que no generan terminales"), $this->debug);
-                Debug::print("\n", $this->debug);
+                Debug::print(Color::Ok("\nProducciones que no generan terminales"));
+                Debug::print("\n");
                 self::ArrayToTree($noTerminales);
                 return $noTerminales;
             }else{
-                Debug::print(Color::Error("\nTodas las producciones generan terminales"), $this->debug);
+                Debug::print(Color::Error("\nTodas las producciones generan terminales"));
                 return 'NOT_TERMINALIZE';
             }
         }else{
             return 'IS_TERMINALIZE';
-            Debug::print(Color::Ok("\nEs un terminal"), $this->debug);
+            Debug::print(Color::Ok("\nEs un terminal"));
         }
-        // --------------------------------------------------------------------------
-        //for ($pos=0; $pos < $arbol->CantidadHijos(); $pos++) { 
-        //    $elem = $arbol->GetElemento($pos);
-        //    Debug::print("\nElemento a analizar: ".$elem."\n", $this->debug);
-        //    if (in_array($elem, $this->V)){
-        //        Debug::print(Color::Error("\nEs una variable"), $this->debug);
-        //        $return = array();
-        //        # Recorremos las producciones
-        //        foreach ($this->P as $keyP => $unaProduccion) {
-        //            # Verificamos si este lo produce.
-        //            /*
-        //
-        //                    EL ERROR ESTA ACA, EL ARBOL NO SE MODIFICA Y NO SE INSERTA EL NUEVO HIJO Y POR ESO ENTRA EN UN BUCLE.
-        //
-        //            */
-        //            if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
-        //                Debug::print(Color::Ok("\nLa siguiente produccion no genera ningun terminal"), $this->debug);
-        //                Debug::print("\n\n", $this->debug);
-        //                $hijo = New Arbol($elem,$unaProduccion[key($unaProduccion)], $this->debug);
-        //                $hijo->MostrarArbol();
-        //                $arbolNuevo = clone $arbol;
-        //                $arbolNuevo->SetChild(new Arbol($elem, $unaProduccion[key($unaProduccion)]),$pos+1, $this->debug);
-        //                array_push($return, $arbolNuevo);
-        //            }
-        //        }
-        //        //self::ArrayToTree($return);
-        //        return (count($return) ? $return : 'NOT_TERMINALIZE');
-        //        /*
-        //        foreach ($this->P as $keyP => $unaProduccion) {
-        //            if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
-        //                $arbolNuevo = unserialize(serialize($arbol));
-        //                $subArbol = new Arbol(key($unaProduccion) ,$unaProduccion[key($unaProduccion)]);
-        //                $arbolNuevo->SetChild($subArbol, $pos -2);  # Arreglar esta linea
-        //                array_push($return, $arbolNuevo);
-        //            }
-        //        }
-        //        return (count($return) ? $return : 'NOT_TERMINALIZE');
-        //        */
-        //    }else{
-        //        Debug::print("\nEs un terminal", $this->debug);
-        //    }
-        //}
-        //return "IS_TERMINALIZE";
     }
 
     public function ForceRoot(Arbol $arbol){
@@ -312,9 +272,9 @@ class AnalizadorSintactico{
 
             # Verificamos si la variable es igual a la key.
             if($token == key($unaProduccion))
-                array_push($return, new Arbol(key($unaProduccion), $unaProduccion[key($unaProduccion)], $this->debug));
+                array_push($return, new Arbol(key($unaProduccion), $unaProduccion[key($unaProduccion)]));
         }
-        Debug::print("\nEl elemento $token puede ser generador por:\n", $this->debug);
+        Debug::print("\nEl elemento $token puede ser generador por:\n");
         self::ArrayToTree($return);
         return $return;
     }    
@@ -326,9 +286,9 @@ class AnalizadorSintactico{
 
             # Verificamos si el primer elemento es igual al token.
             if($token == $unaProduccion[key($unaProduccion)][0])
-                array_push($return, new Arbol(key($unaProduccion), $unaProduccion[key($unaProduccion)], $this->debug));
+                array_push($return, new Arbol(key($unaProduccion), $unaProduccion[key($unaProduccion)]));
         }
-        Debug::print("\nEl elemento $token puede ser generador por:\n", $this->debug);
+        Debug::print("\nEl elemento $token puede ser generador por:\n");
         self::ArrayToTree($return);
         return $return;
     }

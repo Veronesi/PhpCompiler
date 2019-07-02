@@ -2,7 +2,7 @@
 namespace PhpCompiler;
 
 class Debug{
-    public static function print(string $str, $see){
-        if($see) print $str;
+    public static function print(string $str){
+        if(MODE_DEBUG) print $str;
     }
 }

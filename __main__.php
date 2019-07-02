@@ -1,5 +1,5 @@
 <?php
-    
+
     include_once('Arbol.php');
     include_once('Producciones.php');
     include_once('Terminales.php');
@@ -76,9 +76,11 @@ if(in_array("-h", $_SERVER['argv'])){
     $cmd = getFileName('f2');
     if ($cmd){
         if(file_exists($cmd)){
-            $debug = false;
-            if(in_array("-d", $_SERVER['argv'])) : $debug = true; endif;
-            $AnalizadorSintactico = new AnalizadorSintactico($cmd, $debug);
+            if(in_array("-d", $_SERVER['argv']))
+                define("MODE_DEBUG", true); 
+            else
+                define("MODE_DEBUG", false);
+            $AnalizadorSintactico = new AnalizadorSintactico($cmd);
             $AnalizadorSintactico->Analizar();
         }else{
             $fileLev = getLevenshtein($cmd, scandir(__DIR__));

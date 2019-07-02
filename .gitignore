@@ -1,3 +1,4 @@
 # Excluye todos los ficheros con extensión .f y .f2
 *.f
 *.f2
+*.f3
