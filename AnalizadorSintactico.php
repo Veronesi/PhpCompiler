@@ -69,6 +69,7 @@ class AnalizadorSintactico{
                             Debug::print(Color::Error("\nLo eliminamos ya que nadie lo genera."));
                             if(count($resultado) == 1){
                                 print("\n".Color::Advertencia("\nError de Analisis").": error sintactico, no se esperaba '".current($this->tokens[$i])."' en ".__DIR__."\\".$this->fileName." en Linea ".$this->tokens[$i]->line."\n");
+                                exit;
                             }
                         }
                         # Eliminamos el arbol viejo.
@@ -86,8 +87,10 @@ class AnalizadorSintactico{
                             if($nodo != key($this->tokens[$i])){
                                 Debug::print(Color::Error("\nNo coinciden los tokens"));
                                 # Verificamos si era el ultimo posible arbol.
-                                if(count($resultado) == 1)
+                                if(count($resultado) == 1){
                                     print("\n".Color::Advertencia("\nError de Analisis").": error sintactico, no se esperaba '".current($this->tokens[$i])."' en ".__DIR__."\\".$this->fileName." en Linea ".$this->tokens[$i]->line."\n");
+                                    exit;
+                                }
                                     # Eliminamos el arbol.
                                 unset($resultado[$keyR]);
                             }else{
@@ -282,7 +285,8 @@ class AnalizadorSintactico{
             # Verificamos si el primer elemento es igual al token.
             if($token == $unaProduccion[key($unaProduccion)][0]){
                 $prod = $unaProduccion[key($unaProduccion)];
-                $prod[0] = array($token, $valor);
+                if(!preg_match('/\</',$token))
+                    $prod[0] = array($token, $valor);
                 array_push($return, new Tree(key($unaProduccion), $prod));
             }
         }
