@@ -45,6 +45,11 @@ $option = array(
 
 $commands = ['-al', '-as', 'c', '-d', '-f', '-h', '-p', '-r', '-t', '-v', '-y'];
 
+if(in_array("-d", $_SERVER['argv']))
+    define("MODE_DEBUG", true); 
+else
+    define("MODE_DEBUG", false);
+
 if(in_array("-h", $_SERVER['argv'])){
     print Color::Advertencia("\n   php __main__.php comando [opciones]\n");
     print Color::UnderLine("\nComandos de un proyecto:\n");
@@ -86,10 +91,6 @@ if(in_array("-h", $_SERVER['argv'])){
     $cmd = getFileName('f2');
     if ($cmd){
         if(file_exists($cmd)){
-            if(in_array("-d", $_SERVER['argv']))
-                define("MODE_DEBUG", true); 
-            else
-                define("MODE_DEBUG", false);
             $AnalizadorSintactico = new AnalizadorSintactico($cmd);
             $AnalizadorSintactico->Analizar();
         }else{
