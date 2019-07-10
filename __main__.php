@@ -1,6 +1,7 @@
 <?php
 
-    include_once('Arbol.php');
+    //include_once('Arbol.php');
+    include_once('Tree.php');
     include_once('Producciones.php');
     include_once('Terminales.php');
     include_once('Variables.php');
@@ -13,9 +14,10 @@
     include_once('PalabrasReservadas.php');
 
     use \PhpCompiler\Producciones;
+    use \PhpCompiler\Tree;
     use \PhpCompiler\Terminales;
     use \PhpCompiler\Variables;
-    use \PhpCompiler\Arbol;
+    //use \PhpCompiler\Arbol;
     use \PhpCompiler\Color;
     use \PhpCompiler\AnalizadorLexico;
     use \PhpCompiler\AnalizadorSintactico;
@@ -138,7 +140,6 @@ function getFileName($ext){
         if(preg_match('/^\w+\.'.$ext.'$/', $value) && $value != $_SERVER['argv'][0])
             return $value;
     }
-    
 }
 
 function getLevenshtein(string $ask,array $words): string{
