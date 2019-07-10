@@ -25,27 +25,37 @@
     use \PhpCompiler\PalabrasReservadas;
 
 $command = array(
-    '-al <file>'     => " Realiza un analisis lexico",
-    '-as <file>'    => " Realiza un analisis sintactico",
-    '-c  <file>'    => " Compliar archivo",
-    '-d'            => " Modo debug (muestra paso a paso la compilacion)",
-    '-f'            => " Fuerza a compilar un archivo",
-    '-h'            => " Muestra una ayuda",
-    '-p'            => " Muestra la lista de las producciones",
-    '-r  <file>'    => " Ejecuta un archivo compilado",
-    '-t'            => " Muestra la lista de terminales",
-    '-v'            => " Muestra la lista de las variables",
-    '-y'            => " Acepta todas las preguntas que el complidaor hara",
-    'foo="bar"'     => " Pasa como parametro una variable"
+    '-al, --lexico <FileName> '     => " Realiza un analisis lexico",
+    '-as, --sintactico <FileName> ' => " Realiza un analisis sintactico",
+    '-c, --compile <FileName> '     => " Compliar archivo",
+    '-h, --help '                   => " Muestra una ayuda",
+    '-p, --producciones '           => " Muestra la lista de las producciones",
+    '-r, --run <FileName> '         => " Ejecuta un archivo compilado",
+    '-t, --terminales '             => " Muestra la lista de terminales",
+    '-v, --variables '              => " Muestra la lista de las variables"
 );
+
+$option = array(
+    '-d, --debug '                  => " Modo debug (muestra paso a paso la compilacion)",
+    '-f, --force '                  => " Fuerza a compilar un archivo",
+    '-y, --yes '                    => " Acepta todas las preguntas que el complidaor hara",
+    'foo="bar" '                    => " Pasa como parametro una variable"
+);
+
 
 $commands = ['-al', '-as', 'c', '-d', '-f', '-h', '-p', '-r', '-t', '-v', '-y'];
 
 if(in_array("-h", $_SERVER['argv'])){
+    print Color::Advertencia("\n   php __main__.php comando [opciones]\n");
+    print Color::UnderLine("\nComandos de un proyecto:\n");
     foreach ($command as $keyC => $value) {
-        print str_pad("\n   ".$keyC, 20).$value; 
+        print str_pad("\n   ".$keyC, 30, '.').$value; 
     }
-    print "\n\n   Para mas ayuda https://github.com/Veronesi/PhpCompiler \n";
+    print Color::UnderLine("\n\nOpciones:\n");
+    foreach ($option as $keyC => $value) {
+        print str_pad("\n   ".$keyC, 30, '.').$value; 
+    }
+    print "\n\n   Para mas ayuda ".Color::Advertencia("https://github.com/Veronesi/PhpCompiler \n");
 }elseif(in_array("-t", $_SERVER['argv'])){
     foreach (\PhpCompiler\Terminales\terminales as $keyT => $value) {
         print "\n   ".$value; 
@@ -109,6 +119,17 @@ if(in_array("-h", $_SERVER['argv'])){
         }
     }else
         print Color::Error("   Se esperaba como parametro el nombre del archivo con extencion .f")."\n   php ".$_SERVER['argv'][0]." -cl <file>";
+}else{
+    print Color::Advertencia("\n   php __main__.php comando [opciones]\n");
+    print Color::UnderLine("\nComandos de un proyecto:\n");
+    foreach ($command as $keyC => $value) {
+        print str_pad("\n   ".$keyC, 30, '.').$value; 
+    }
+    print Color::UnderLine("\n\nOpciones:\n");
+    foreach ($option as $keyC => $value) {
+        print str_pad("\n   ".$keyC, 30, '.').$value; 
+    }
+    print "\n\n   Para mas ayuda ".Color::Advertencia("https://github.com/Veronesi/PhpCompiler \n");
 }
 
 function getFileName($ext){
