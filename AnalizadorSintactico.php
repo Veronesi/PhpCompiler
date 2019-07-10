@@ -42,8 +42,7 @@ class AnalizadorSintactico{
         $i = 1;
 
         # Es el primer elemento
-        $resultado = self::Generadores(key($this->tokens[0]));
-
+        $resultado = self::Generadores(key($this->tokens[0]), $this->tokens[0]->{key($this->tokens[0])});
         while($i< count($this->tokens)){
             $ProximoToken = true;
             Debug::print("\n-------------------------------------------");
@@ -70,6 +69,7 @@ class AnalizadorSintactico{
                             Debug::print(Color::Error("\nLo eliminamos ya que nadie lo genera."));
                             if(count($resultado) == 1){
                                 print("\n".Color::Advertencia("\nError de Analisis").": error sintactico, no se esperaba '".current($this->tokens[$i])."' en ".__DIR__."\\".$this->fileName." en Linea ".$this->tokens[$i]->line."\n");
+                                exit;
                             }
                         }
                         # Eliminamos el arbol viejo.
@@ -87,13 +87,16 @@ class AnalizadorSintactico{
                             if($nodo != key($this->tokens[$i])){
                                 Debug::print(Color::Error("\nNo coinciden los tokens"));
                                 # Verificamos si era el ultimo posible arbol.
-                                if(count($resultado) == 1)
+                                if(count($resultado) == 1){
                                     print("\n".Color::Advertencia("\nError de Analisis").": error sintactico, no se esperaba '".current($this->tokens[$i])."' en ".__DIR__."\\".$this->fileName." en Linea ".$this->tokens[$i]->line."\n");
+                                    exit;
+                                }
                                     # Eliminamos el arbol.
                                 unset($resultado[$keyR]);
-                            }else
+                            }else{
+                                $unResultado->ChangeChild(array($nodo, $this->tokens[$i]->{key($this->tokens[$i])}),$i);
                                 Debug::print(Color::Ok("\nCoinciden los tokens"));
-
+                            }
                         }elseif(in_array($nodo, $this->V)){
                             # El nodo no es una Variable.
                             Debug::print("\nEl nodo es una Variable");
@@ -203,7 +206,7 @@ class AnalizadorSintactico{
         }
     }
 
-    public function ForceTerminal(Arbol $arbol){
+    public function ForceTerminal(Tree $arbol){
         # El unico elemento que puede ser una variable es el ultimo. 
         $elem = $arbol->GetElemento($arbol->CantidadHijos() -1);
         Debug::print("\nElemento a analizar: ".$elem." (Posicion: ".($arbol->CantidadHijos() -1).")"."\n");
@@ -214,7 +217,7 @@ class AnalizadorSintactico{
             $noTerminales = array();
             foreach ($this->P as $keyP => $unaProduccion) {
                 if(key($unaProduccion) == $elem && !self::PoseeTerminales($unaProduccion[key($unaProduccion)])){
-                    $hijo = New Arbol($elem,$unaProduccion[key($unaProduccion)]);
+                    $hijo = New Tree($elem,$unaProduccion[key($unaProduccion)]);
                     array_push($noTerminales, $hijo);
                 }
             }
@@ -233,7 +236,7 @@ class AnalizadorSintactico{
         }
     }
 
-    public function ForceRoot(Arbol $arbol){
+    public function ForceRoot(Tree $arbol){
         if($arbol->nodo != $this->S){
             $return = array();
             # Buscamos quienes generan a la raiz.
@@ -267,21 +270,25 @@ class AnalizadorSintactico{
 
             # Verificamos si la variable es igual a la key.
             if($token == key($unaProduccion))
-                array_push($return, new Arbol(key($unaProduccion), $unaProduccion[key($unaProduccion)]));
+                array_push($return, new Tree(key($unaProduccion), $unaProduccion[key($unaProduccion)]));
         }
         Debug::print("\nEl elemento $token puede ser generador por:\n");
         self::ArrayToTree($return);
         return $return;
     }    
-    public function Generadores(string $token): array{
+    public function Generadores(string $token, string $valor = ""): array{
         $return = array();
 
         # Recorremos las Producciones.
         foreach ($this->P as $keyP => $unaProduccion) {
 
             # Verificamos si el primer elemento es igual al token.
-            if($token == $unaProduccion[key($unaProduccion)][0])
-                array_push($return, new Arbol(key($unaProduccion), $unaProduccion[key($unaProduccion)]));
+            if($token == $unaProduccion[key($unaProduccion)][0]){
+                $prod = $unaProduccion[key($unaProduccion)];
+                if(!preg_match('/\</',$token))
+                    $prod[0] = array($token, $valor);
+                array_push($return, new Tree(key($unaProduccion), $prod));
+            }
         }
         Debug::print("\nEl elemento $token puede ser generador por:\n");
         self::ArrayToTree($return);

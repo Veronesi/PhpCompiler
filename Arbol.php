@@ -3,10 +3,12 @@ namespace PhpCompiler;
 
 include_once('color.php');
 include_once('Debug.php');
-
+#fix it
 class Arbol{
+
     public $nodo;
     public $hijos;
+
     function __construct(string $nodo = "",array $hijos = array()){
         $this->nodo = $nodo;
         $this->hijos = $hijos;

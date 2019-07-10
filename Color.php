@@ -31,7 +31,9 @@ class Color{
     public static function Yellow(string $str): string{
         return Color::$YELLOW.$str.Color::$ENDC; 
     }
-
+    public static function UnderLine(string $str): string{
+        return Color::$UNDERLINE.$str.Color::$ENDC; 
+    }    
 
 
 }
