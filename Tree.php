@@ -20,8 +20,11 @@ class Tree{
             if(gettype($hijo) == "object"){
                 $count += $hijo->CantidadHijos();
             }else{
-                if($hijo != 'EPSILON')
-                    $count++;
+                if(gettype($hijo == 'string')){
+                    if($hijo != 'EPSILON')
+                        $count++;
+                }
+
             }
         }
         return $count;       
@@ -30,14 +33,13 @@ class Tree{
         $contador = 0;
         while($contador <= $posicion){
             if(gettype($this->hijos[$contador]) == "object"){
-                
                 if($this->hijos[$contador]->CantidadHijos() > ($posicion - $contador)){
                     # Esta aca dentro
                     $nodo = $this->hijos[$contador]->GetElemento($posicion - $contador);
                     return $nodo;
                 }else
                     $posicion-= $this->hijos[$contador]->CantidadHijos() -1;
-                    $contador++;
+                $contador++;
             }elseif($contador < $posicion){
                 $contador++;
             }elseif($contador == $posicion){
@@ -88,17 +90,18 @@ class Tree{
                 $count += $hijo->ChangeChild($nodo, ($posicion - $count));
             }else{
                 if($count == $posicion){
-                    $this->hijos[$ninterno] = $nodo;
+                    if($hijo != 'EPSILON'){
+                        Debug::print(Color::Yellow("\nNodo reemplazodo: ".$this->hijos[$ninterno]));
+                        $this->hijos[$ninterno] = $nodo;
+                    }
                 }else
                     $ninterno++;
                 # Pasamos al proximo elemento.
                 if(gettype($hijo) == 'string'){
                     if($hijo != 'EPSILON')
+                        $count++;
+                }else
                     $count++;
-                }else{
-                    if($hijo[0] != 'EPSILON')
-                    $count++;
-                }
             }
         }
         return $count;

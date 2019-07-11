@@ -48,7 +48,7 @@ class AnalizadorSintactico{
             Debug::print("\n-------------------------------------------");
             Debug::print("\nToken a analizar: ".key($this->tokens[$i])." '".$this->tokens[$i]->{key($this->tokens[$i])}."'");
             self::ArrayToTree($resultado, true);
-                # Recorremos las producciones obtenemos el i-esimo elemento del arbol.
+            # Recorremos las producciones obtenemos el i-esimo elemento del arbol.
                 foreach ($resultado as $keyR => $unResultado) {
                     Debug::print("\n  - . - . - . - . -Arbol: $keyR - . - . - . - . - . -");
                     Debug::print("\nCantidad de hijos: ".$unResultado->CantidadHijos());
@@ -78,7 +78,7 @@ class AnalizadorSintactico{
 
                     }else{
                         $nodo = $unResultado->GetElemento($i);
-                        Debug::print("\nNodo: $nodo");
+                        Debug::print("\nNodo: $nodo ( $i )");
                         # Verificamos que es.
                         if(in_array($nodo, $this->T)){
                             # Es un terminal.
@@ -94,6 +94,7 @@ class AnalizadorSintactico{
                                     # Eliminamos el arbol.
                                 unset($resultado[$keyR]);
                             }else{
+                                Debug::print("\nToken cambiado: ".$unResultado->GetElemento($i));
                                 $unResultado->ChangeChild(array($nodo, $this->tokens[$i]->{key($this->tokens[$i])}),$i);
                                 Debug::print(Color::Ok("\nCoinciden los tokens"));
                             }
